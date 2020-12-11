@@ -304,8 +304,15 @@ namespace xu
       uint64_t a_mant, b_mant;
       int8_t a_pow, b_pow;
 
+      short compare = _compareMagnitudeTo(other);
+
+      /* equal but opposite */
+      if (compare == 0)
+      {
+        return res;
+      }
       /* this is larger magnitude than other */
-      if (_compareMagnitudeTo(other) > 0)
+      else if (compare > 0)
       {
         a_mant = mant;
         a_pow = pow;
