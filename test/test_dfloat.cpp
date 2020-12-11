@@ -25,7 +25,7 @@
 #include <iostream>
 #include "dfloat.h"
 
-#define MAX32 4294967295ll
+#define MAX32 4294967295
 
 typedef xu::dfloat dfloat;
 
@@ -45,7 +45,7 @@ int main()
 
   dfloat df1(0.123);
 
-  dfloat df2(-50000ll);
+  dfloat df2(-50000);
 
   dfloat df3("012310123409010203040.506070809");
 
@@ -63,13 +63,13 @@ int main()
 
   std::cout << (df1 - df2) << std::endl;
 
-  std::cout << dfloat(MAX32) * 2ll / (dfloat(MAX32)) << std::endl;
+  std::cout << dfloat(MAX32) * 2 / (dfloat(MAX32)) << std::endl;
 
-  df2 /= 25ll;
+  df2 /= 25;
 
   std::cout << df2 << std::endl;
 
-  df2 += 1ll;
+  df2 += 1;
 
   std::cout << df2 << std::endl;
 

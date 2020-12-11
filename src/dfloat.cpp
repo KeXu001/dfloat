@@ -48,6 +48,18 @@ namespace xu
 
   }
 
+  dfloat::dfloat(int value)
+    : dfloat((long long)value)
+  {
+
+  }
+
+  dfloat::dfloat(long value)
+    : dfloat((long long)value)
+  {
+
+  }
+
   dfloat::dfloat(long long value)
   {
     if (value == 0)

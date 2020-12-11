@@ -121,6 +121,10 @@ namespace xu
     //  Conversions
     //  ===========
 
+    dfloat(int value);
+
+    dfloat(long value);
+
     dfloat(long long value);
 
     dfloat(double value);
