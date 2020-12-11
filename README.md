@@ -11,7 +11,7 @@ Not intended for highly-optimized applications.
 
 Rough comparison (on the order of 1 million operations):
 
-| Test | Type | Opt (g++) | Elapsed | Elapsed (Ratio) |
+| Test | Type | Opt (g++) | Elapsed | Ratio (Higher is worse) |
 | ---- | ---- | --------- | ------- | --------------- |
 | sum += (a+b+c+d+e) | double | -O0 | 0.00520982 | 1:1 |
 | sum += (a-b-c-d-e) | double | -O0 | 0.00524061 | 1:1 |
