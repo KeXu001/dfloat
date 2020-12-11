@@ -134,7 +134,11 @@ namespace xu
     double res = mant;
     res /= SCALE;
 
-    /* multiply by 10^pow */
+    /*
+      Multiply by 10^pow
+      This should be safe because IEEE754 uses 11 bits for the exponent while
+      we only use 8
+    */
     unsigned pow_to_zero = pow;
     while (pow_to_zero > 0)
     {
