@@ -72,4 +72,8 @@ int main()
   df2 += 1l;
 
   std::cout << df2 << std::endl;
+
+  std::cout << (double)df3 << std::endl;
+
+  std::cout << 012310123409010203040.506070809 << std::endl;
 }

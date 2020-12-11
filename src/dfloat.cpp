@@ -129,6 +129,27 @@ namespace xu
     }
   }
 
+  dfloat:: operator double() const
+  {
+    double res = mant;
+    res /= SCALE;
+
+    /* multiply by 10^pow */
+    unsigned pow_to_zero = pow;
+    while (pow_to_zero > 0)
+    {
+      res *= BASE;
+      pow_to_zero--;
+    }
+    while (pow_to_zero < 0)
+    {
+      res /= BASE;
+      pow_to_zero++;
+    }
+
+    return res;
+  }
+
   bool dfloat::operator==(const dfloat& other) const
   {
     return 0 == _comparedTo(other);

@@ -125,6 +125,8 @@ namespace xu
 
     dfloat(double value);
 
+    explicit operator double() const;
+
     //  ====================
     //  Comparison Operators
     //  ====================
