@@ -78,7 +78,7 @@ public:
   }
 };
 
-#define TEST(a,b,c,d,e) sum += (a + b * c + d - e);
+#define TEST(a,b,c,d,e) sum += (a * b * c * d * e);
 
 #define START_LOOP(i) for (size_t i = 0; i < count; i++) {
 
@@ -114,8 +114,8 @@ void test_double(const Data<long long>& data)
       double(data[e]))
   )
 
-  std::cout << "Double arithmetic: " << t.stop() << std::endl;
-  std::cout << "Sum = " << sum << std::endl;
+  std::cout << "double arithmetic: " << t.stop() << std::endl;
+  std::cout << "\tsum = " << sum << std::endl;
 }
 
 
@@ -136,8 +136,8 @@ void test_dfloat(const Data<long long>& data)
       dfloat(data[e]))
   )
 
-  std::cout << "Double arithmetic: " << t.stop() << std::endl;
-  std::cout << "Sum = " << sum << std::endl;
+  std::cout << "dfloat arithmetic: " << t.stop() << std::endl;
+  std::cout << "\tsum = " << sum << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -161,9 +161,7 @@ int main(int argc, char* argv[])
   }
 
 
-  std::cout << "Testing double arithmetic" << std::endl;
   test_double(data);
 
-  std::cout << "Testing dfloat arithmetic" << std::endl;
   test_dfloat(data);
 }
