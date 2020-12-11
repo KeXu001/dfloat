@@ -78,67 +78,47 @@ public:
   }
 };
 
-#define TEST(a,b,c,d,e) sum += (a * b * c * d * e);
+#define TEST_ADD(a,b,c,d,e) sum += (a + b + c + d + e);
+#define TEST_SUBTRACT(a,b,c,d,e) sum += (a - b - c - d - e);
+#define TEST_MULTIPLY(a,b,c,d,e) sum += (a * b * c * d * e);
+#define TEST_DIVIDE(a,b,c,d,e) sum += (a / b / c / d / e);
 
 #define START_LOOP(i) for (size_t i = 0; i < count; i++) {
 
 #define END_LOOP() }
 
-#define NESTED_LOOP(code)       \
-  START_LOOP(a)                 \
-      START_LOOP(b)             \
-        START_LOOP(c)           \
-          START_LOOP(d)         \
-            START_LOOP(e)       \
-              code              \
-            END_LOOP()          \
-          END_LOOP()            \
-        END_LOOP()              \
-      END_LOOP()                \
+#define NESTED_LOOP(TYPE, TEST)                                                 \
+  START_LOOP(a)                                                                 \
+      START_LOOP(b)                                                             \
+        START_LOOP(c)                                                           \
+          START_LOOP(d)                                                         \
+            START_LOOP(e)                                                       \
+              TEST(                                                             \
+                TYPE(data[a]),                                                  \
+                TYPE(data[b]),                                                  \
+                TYPE(data[c]),                                                  \
+                TYPE(data[d]),                                                  \
+                TYPE(data[e]))                                                  \
+            END_LOOP()                                                          \
+          END_LOOP()                                                            \
+        END_LOOP()                                                              \
+      END_LOOP()                                                                \
     END_LOOP()
 
-void test_double(const Data<long long>& data)
-{
-  size_t count = data.count();
-  double sum = 0;
-
-  Timer t;
-  t.start();
-
-  NESTED_LOOP(
-    TEST(
-      double(data[a]),
-      double(data[b]),
-      double(data[c]),
-      double(data[d]),
-      double(data[e]))
-  )
-
-  std::cout << "double arithmetic: " << t.stop() << std::endl;
-  std::cout << "\tsum = " << sum << std::endl;
-}
-
-
-void test_dfloat(const Data<long long>& data)
-{
-  size_t count = data.count();
-  dfloat sum = 0;
-
-  Timer t;
-  t.start();
-
-  NESTED_LOOP(
-    TEST(
-      dfloat(data[a]),
-      dfloat(data[b]),
-      dfloat(data[c]),
-      dfloat(data[d]),
-      dfloat(data[e]))
-  )
-
-  std::cout << "dfloat arithmetic: " << t.stop() << std::endl;
-  std::cout << "\tsum = " << sum << std::endl;
-}
+#define DO_TEST(TYPE, TEST)                                                     \
+  {                                                                             \
+    size_t count = data.count();                                                \
+    TYPE sum = 0;                                                               \
+                                                                                \
+    Timer t;                                                                    \
+    t.start();                                                                  \
+                                                                                \
+    NESTED_LOOP(TYPE, TEST);                                                    \
+                                                                                \
+    std::cout << "Results for " << #TYPE << ":" << std::endl;                   \
+    std::cout << "  elapsed: " << t.stop() << std::endl;                        \
+    std::cout << "  sum:     " << sum << std::endl;                             \
+  }
 
 int main(int argc, char* argv[])
 {
@@ -160,8 +140,7 @@ int main(int argc, char* argv[])
     std::cout << "Read " << data.count() << " numbers from file" << std::endl;
   }
 
-
-  test_double(data);
-
-  test_dfloat(data);
+  DO_TEST(double, TEST_SUBTRACT);
+  
+  DO_TEST(dfloat, TEST_SUBTRACT);
 }
