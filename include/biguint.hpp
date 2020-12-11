@@ -419,10 +419,11 @@ namespace xu
   template <size_t w>
   uint32_t biguint<w>::_getBit(size_t at) const
   {
-    if (at >= w * WORD_SIZE)
-    {
-      throw std::out_of_range("Bit index is out of range");
-    }
+    /* currently a protected member function */
+    // if (at >= w * WORD_SIZE)
+    // {
+    //   throw std::out_of_range("Bit index is out of range");
+    // }
 
     size_t word_idx = at / WORD_SIZE;
     size_t bit_idx = at % WORD_SIZE;
@@ -433,10 +434,11 @@ namespace xu
   template <size_t w>
   void biguint<w>::_setBit(size_t at, uint32_t to)
   {
-    if (at >= w * WORD_SIZE)
-    {
-      throw std::runtime_error("Bit index out of range");
-    }
+    /* currently a protected member function */
+    // if (at >= w * WORD_SIZE)
+    // {
+    //   throw std::runtime_error("Bit index is out of range");
+    // }
 
     size_t word_idx = at / WORD_SIZE;
     size_t bit_idx = at % WORD_SIZE;

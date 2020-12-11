@@ -171,6 +171,8 @@ namespace xu
               Index of bit
       @param  to
               0 if bit should be cleared, nonzero if bit should be set
+      @throw  std::out_of_range
+              If index is out of range
       */
     void _setBit(size_t at, uint32_t to);
 
