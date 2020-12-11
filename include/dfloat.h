@@ -121,7 +121,7 @@ namespace xu
     //  Conversions
     //  ===========
 
-    dfloat(int64_t value);
+    dfloat(long long value);
 
     dfloat(double value);
 

@@ -48,7 +48,7 @@ namespace xu
 
   }
 
-  dfloat::dfloat(int64_t value)
+  dfloat::dfloat(long long value)
   {
     if (value == 0)
     {
