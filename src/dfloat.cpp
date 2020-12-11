@@ -343,7 +343,7 @@ namespace xu
         99 million billion * 99 million billion / 100 million billion
         is less than 2^64 - 1
     */
-    res.mant = a * b / biguint<4>(SCALE);
+    res.mant = (uint64_t)(a * b / SCALE);
 
     if (res.mant >= MANT_CAP)
     {
@@ -383,7 +383,7 @@ namespace xu
     }
 
     /* multiply the numerator by scale before dividing */
-    res.mant = (a * biguint<4>(SCALE)) / b;
+    res.mant = (uint64_t)(a * SCALE / b);
 
     return res;
   }

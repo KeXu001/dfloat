@@ -60,9 +60,9 @@ namespace xu
 
     biguint(const uint64_t value);
 
-    operator uint32_t() const;
+    explicit operator uint32_t() const;
 
-    operator uint64_t() const;
+    explicit operator uint64_t() const;
 
     //  =================
     //  Bitwise Operators

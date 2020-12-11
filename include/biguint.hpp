@@ -96,7 +96,7 @@ namespace xu
   {
     static_assert(w >= 2, "Value too wide for biguint");
 
-    words[0] = value & ((1ul << WORD_SIZE) - 1);
+    words[0] = value & 0xFFFFFFFF;
     words[1] = value >> WORD_SIZE;
   }
 
@@ -262,7 +262,7 @@ namespace xu
   template <unsigned w>
   biguint<w> biguint<w>::operator-(const biguint<w>& other) const
   {
-    return operator+(~other + biguint<w>(1u));
+    return operator+(~other + 1u);
   }
 
   template <unsigned w>
@@ -336,7 +336,7 @@ namespace xu
       if (at > 0)
       {
         /* append next digit */
-        dividend = (dividend << (unsigned)1) | biguint<w>(_getBit(at - 1));
+        dividend = (dividend << 1) | _getBit(at - 1);
       }
       /* since at is unsigned, we need to break manually rather than use a >= 0 condition */
       else
@@ -443,7 +443,7 @@ namespace xu
     unsigned word_idx = at / WORD_SIZE;
     unsigned bit_idx = at % WORD_SIZE;
 
-    uint32_t bit_msk = (1 << bit_idx);
+    uint32_t bit_msk = (0x1 << bit_idx);
 
     if (to == 0)
     {
