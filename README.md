@@ -1,7 +1,9 @@
 # dfloat
 ### Decimal floating point type for C++
 
-`xu::dfloat` stores a decimal number with 18 digits of precision (base-10), with 8-bit exponent [-128, 127)
+`xu::dfloat` stores a decimal number with 18 digits of precision and exponent between [-128, 127)
+
+Basic arithmetic operation (+ - \* /) support. All operations are truncating (round towards zero) beyond 18 digits.
 
 Uses fixed-width integer types from `<cstdint>` internally.
 
