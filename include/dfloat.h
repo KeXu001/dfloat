@@ -144,6 +144,20 @@ namespace xu
     bool isZero() const;
 
     //  ====================
+    //  Assignment Operators
+    //  ====================
+
+    // dfloat& operator=(const dfloat& other);
+
+    dfloat& operator+=(const dfloat& other);
+
+    dfloat& operator-=(const dfloat& other);
+
+    dfloat& operator*=(const dfloat& other);
+
+    dfloat& operator/=(const dfloat& other);
+
+    //  ====================
     //  Arithmetic Operators
     //  ====================
 

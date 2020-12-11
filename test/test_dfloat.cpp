@@ -64,4 +64,12 @@ int main()
   std::cout << (df1 - df2) << std::endl;
 
   std::cout << dfloat(MAX32) * 2l / (dfloat(MAX32)) << std::endl;
+
+  df2 /= 25l;
+
+  std::cout << df2 << std::endl;
+
+  df2 += 1l;
+
+  std::cout << df2 << std::endl;
 }

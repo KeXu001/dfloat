@@ -164,6 +164,31 @@ namespace xu
     return sign == Sign::ZERO;
   }
 
+  // dfloat& dfloat::operator=(const dflaot& other)
+  // {
+
+  // }
+
+  dfloat& dfloat::operator+=(const dfloat& other)
+  {
+    return operator=(operator+(other));
+  }
+
+  dfloat& dfloat::operator-=(const dfloat& other)
+  {
+    return operator=(operator-(other));
+  }
+
+  dfloat& dfloat::operator*=(const dfloat& other)
+  {
+    return operator=(operator*(other));
+  }
+  
+  dfloat& dfloat::operator/=(const dfloat& other)
+  {
+    return operator=(operator/(other));
+  }
+
   dfloat dfloat::operator-() const
   {
     if (sign == Sign::POSITIVE)
