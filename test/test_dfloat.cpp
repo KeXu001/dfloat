@@ -22,6 +22,7 @@
  *  SOFTWARE.
  */
 
+#include <iomanip>
 #include <iostream>
 #include "dfloat.h"
 
@@ -43,9 +44,9 @@ int main()
 
   // dfloat df2(0ul);
 
-  dfloat df1(0.123);
+  dfloat df1(110.0);
 
-  dfloat df2(-50000);
+  dfloat df2("110");
 
   dfloat df3("012310123409010203040.506070809");
 
@@ -76,4 +77,9 @@ int main()
   std::cout << (double)df3 << std::endl;
 
   std::cout << 012310123409010203040.506070809 << std::endl;
+
+  double oneten = 110;
+  std::cout << std::boolalpha << (oneten > 110) << std::endl;
+  std::cout << std::boolalpha << (df1 > 110) << std::endl;
+  std::cout << std::boolalpha << (df2 > 110) << std::endl;
 }
