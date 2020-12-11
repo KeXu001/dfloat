@@ -34,14 +34,14 @@ namespace xu
     @tparam w
             Width of the biguint (in units of 32-bit words)
     */
-  template <size_t w>
+  template <unsigned w>
   class biguint
   {
   public:
     /**
       @brief  Number of bits in one word
       */
-    static const size_t WORD_SIZE = 32;
+    static const unsigned WORD_SIZE = 32;
 
   public:
     /**
@@ -76,9 +76,9 @@ namespace xu
 
     biguint<w> operator^(const biguint<w>& other) const;
 
-    biguint<w> operator<<(size_t shift) const;
+    biguint<w> operator<<(unsigned shift) const;
 
-    biguint<w> operator>>(size_t shift) const;
+    biguint<w> operator>>(unsigned shift) const;
 
     //  ====================
     //  Comparison Operators
@@ -134,7 +134,7 @@ namespace xu
       @throw  std::out_of_range
               If index is out of range
       */
-    uint32_t operator[](size_t at) const;
+    uint32_t operator[](unsigned at) const;
 
   protected:
     //  ================
@@ -163,7 +163,7 @@ namespace xu
       @throw  std::out_of_range
               If index is out of range
       */
-    uint32_t _getBit(size_t at) const;
+    uint32_t _getBit(unsigned at) const;
 
     /**
       @brief  Sets the bit at specified index
@@ -174,7 +174,7 @@ namespace xu
       @throw  std::out_of_range
               If index is out of range
       */
-    void _setBit(size_t at, uint32_t to);
+    void _setBit(unsigned at, uint32_t to);
 
     /**
       @brief  Returns whether value is zero

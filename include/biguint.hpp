@@ -65,23 +65,23 @@ namespace xu
     return carry;
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w>::biguint()
     : words{0}
   {
     
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w>::biguint(const biguint<w>& other)
   {
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
       words[i] = other.words[i];
     }
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w>::biguint(const uint32_t value)
     : words{0}
   {
@@ -90,7 +90,7 @@ namespace xu
     words[0] = value;
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w>::biguint(const uint64_t value)
     : words{0}
   {
@@ -100,25 +100,25 @@ namespace xu
     words[1] = value >> WORD_SIZE;
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w>::operator uint32_t() const
   {
     return words[0];
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w>::operator uint64_t() const
   {
     return ((uint64_t)words[1] << WORD_SIZE) |
       ((uint64_t)words[0]);
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w> biguint<w>::operator~() const
   {
     biguint res;
 
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
       res.words[i] = ~words[i];
     }
@@ -126,12 +126,12 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w> biguint<w>::operator&(const biguint<w>& other) const
   {
     biguint res;
 
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
       res.words[i] = words[i] & other.words[i];
     }
@@ -139,12 +139,12 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w> biguint<w>::operator|(const biguint<w>& other) const
   {
     biguint res;
 
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
       res.words[i] = words[i] | other.words[i];
     }
@@ -152,12 +152,12 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w> biguint<w>::operator^(const biguint<w>& other) const
   {
     biguint res;
 
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
       res.words[i] = words[i] ^ other.words[i];
     }
@@ -165,8 +165,8 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
-  biguint<w> biguint<w>::operator<<(size_t shift) const
+  template <unsigned w>
+  biguint<w> biguint<w>::operator<<(unsigned shift) const
   {
     biguint res(*this);
 
@@ -187,8 +187,8 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
-  biguint<w> biguint<w>::operator>>(size_t shift) const
+  template <unsigned w>
+  biguint<w> biguint<w>::operator>>(unsigned shift) const
   {
     biguint res(*this);
 
@@ -209,49 +209,49 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
+  template <unsigned w>
   bool biguint<w>::operator==(const biguint<w>& other) const
   {
     return 0 == _comparedTo(other);
   }
 
-  template <size_t w>
+  template <unsigned w>
   bool biguint<w>::operator!=(const biguint<w>& other) const
   {
     return 0 != _comparedTo(other);
   }
 
-  template <size_t w>
+  template <unsigned w>
   bool biguint<w>::operator>(const biguint<w>& other) const
   {
     return 1 == _comparedTo(other);
   }
 
-  template <size_t w>
+  template <unsigned w>
   bool biguint<w>::operator<(const biguint<w>& other) const
   {
     return -1 == _comparedTo(other);
   }
 
-  template <size_t w>
+  template <unsigned w>
   bool biguint<w>::operator>=(const biguint<w>& other) const
   {
     return 0 <= _comparedTo(other);
   }
 
-  template <size_t w>
+  template <unsigned w>
   bool biguint<w>::operator<=(const biguint<w>& other) const
   {
     return 0 >= _comparedTo(other);
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w> biguint<w>::operator+(const biguint<w>& other) const
   {
     biguint res;
 
     uint32_t carry = 0;
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
       carry = addCarry(words[i], other.words[i], carry, res.words[i]);
     }
@@ -259,18 +259,18 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w> biguint<w>::operator-(const biguint<w>& other) const
   {
     return operator+(~other + biguint<w>(1u));
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w> biguint<w>::operator*(const biguint<w>& other) const
   {
     biguint res;
 
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
       uint64_t a = words[i];
 
@@ -282,7 +282,7 @@ namespace xu
       /* product of words[i] * other */
       biguint part;
 
-      for (size_t j = 0; j < w; j++)
+      for (unsigned j = 0; j < w; j++)
       {
         uint64_t b = other.words[j];
 
@@ -306,7 +306,7 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
+  template <unsigned w>
   biguint<w> biguint<w>::operator/(const biguint<w>& other) const
   {
     if (other._isZero())
@@ -320,7 +320,7 @@ namespace xu
 
     biguint<w> dividend(_getBit(w * WORD_SIZE - 1));
 
-    for (size_t at = w * WORD_SIZE - 1;; at--)
+    for (unsigned at = w * WORD_SIZE - 1;; at--)
     {
       if (other<=dividend)\
       {
@@ -336,9 +336,9 @@ namespace xu
       if (at > 0)
       {
         /* append next digit */
-        dividend = (dividend << (size_t)1) | biguint<w>(_getBit(at - 1));
+        dividend = (dividend << (unsigned)1) | biguint<w>(_getBit(at - 1));
       }
-      /* since size_t is unsigned, we need to break manually rather than use a >= 0 condition */
+      /* since at is unsigned, we need to break manually rather than use a >= 0 condition */
       else
       {
         break;
@@ -348,8 +348,8 @@ namespace xu
     return res;
   }
 
-  template <size_t w>
-  uint32_t biguint<w>::operator[](size_t at) const
+  template <unsigned w>
+  uint32_t biguint<w>::operator[](unsigned at) const
   {
     if (at >= w)
     {
@@ -359,12 +359,12 @@ namespace xu
     return words[at];
   }
 
-  template <size_t w>
+  template <unsigned w>
   void biguint<w>::_leftShiftOneBit()
   {
-    for (size_t i = 0; i < w - 1; i++)
+    for (unsigned i = 0; i < w - 1; i++)
     {
-      size_t ii = w - 1 - i;
+      unsigned ii = w - 1 - i;
 
       words[ii] = (words[ii] << 1) | (words[ii - 1] >> 31);
     }
@@ -372,12 +372,12 @@ namespace xu
     words[0] <<= 1;
   }
 
-  template <size_t w>
+  template <unsigned w>
   void biguint<w>::_leftShiftOneWord()
   {
-    for (size_t i = 0; i < w - 1; i++)
+    for (unsigned i = 0; i < w - 1; i++)
     {
-      size_t ii = w - 1 - i;
+      unsigned ii = w - 1 - i;
 
       words[ii] = words[ii - 1];
     }
@@ -385,10 +385,10 @@ namespace xu
     words[0] = 0;;
   }
 
-  template <size_t w>
+  template <unsigned w>
   void biguint<w>::_rightShiftOneBit()
   {
-    for (size_t i = 0; i < w - 1; i++)
+    for (unsigned i = 0; i < w - 1; i++)
     {
       words[i] = words[i + 1];
     }
@@ -396,12 +396,12 @@ namespace xu
     words[w - 1] = 0;
   }
 
-  template <size_t w>
+  template <unsigned w>
   short biguint<w>::_comparedTo(const biguint<w>& other) const
   {
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
-      size_t ii = w - 1 - i;
+      unsigned ii = w - 1 - i;
 
       if (words[ii] > other.words[ii])
       {
@@ -416,8 +416,8 @@ namespace xu
     return 0;
   }
 
-  template <size_t w>
-  uint32_t biguint<w>::_getBit(size_t at) const
+  template <unsigned w>
+  uint32_t biguint<w>::_getBit(unsigned at) const
   {
     /* currently a protected member function */
     // if (at >= w * WORD_SIZE)
@@ -425,14 +425,14 @@ namespace xu
     //   throw std::out_of_range("Bit index is out of range");
     // }
 
-    size_t word_idx = at / WORD_SIZE;
-    size_t bit_idx = at % WORD_SIZE;
+    unsigned word_idx = at / WORD_SIZE;
+    unsigned bit_idx = at % WORD_SIZE;
 
     return ((words[word_idx] >> bit_idx) & 0x1);
   }
 
-  template <size_t w>
-  void biguint<w>::_setBit(size_t at, uint32_t to)
+  template <unsigned w>
+  void biguint<w>::_setBit(unsigned at, uint32_t to)
   {
     /* currently a protected member function */
     // if (at >= w * WORD_SIZE)
@@ -440,8 +440,8 @@ namespace xu
     //   throw std::runtime_error("Bit index is out of range");
     // }
 
-    size_t word_idx = at / WORD_SIZE;
-    size_t bit_idx = at % WORD_SIZE;
+    unsigned word_idx = at / WORD_SIZE;
+    unsigned bit_idx = at % WORD_SIZE;
 
     uint32_t bit_msk = (1 << bit_idx);
 
@@ -455,10 +455,10 @@ namespace xu
     }
   }
 
-  template <size_t w>
+  template <unsigned w>
   bool biguint<w>::_isZero() const
   {
-    for (size_t i = 0; i < w; i++)
+    for (unsigned i = 0; i < w; i++)
     {
       if (words[i] != 0)
       {
