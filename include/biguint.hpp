@@ -366,9 +366,9 @@ namespace xu
 
     biguint<w> dividend(_getBit(w * WORD_SIZE - 1));
 
-    for (unsigned at = w * WORD_SIZE - 1;; at--)
+    for (unsigned at = w * WORD_SIZE - 1; ; at--)
     {
-      if (other<=dividend)\
+      if (other <= dividend)
       {
         res._setBit(at, 1);
 
