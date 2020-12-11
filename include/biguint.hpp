@@ -27,7 +27,7 @@
 namespace xu
 {
   /**
-    @brief      Inline helper function for biguint addition
+    @brief      Inline helper function for biguint addition and multiplication
     @param[in]  a
                 First operand to add
     @param[in]  b
@@ -44,6 +44,9 @@ namespace xu
     const uint32_t& c,
     uint32_t& out)
   {
+    /* we store the output separately until assignment in case `out` is also one of the input operands */
+    uint32_t res;
+
     uint32_t carry = 0;
 
     /*
@@ -52,17 +55,42 @@ namespace xu
       If c is no greater than 1, then only one of the below increment operations may occur at most
       */
 
-    if ((out = a + b) < b)
+    if ((res = a + b) < b)
     {
       carry++;
     }
 
-    if ((out = out + c) < c)
+    if ((res = res + c) < c)
     {
       carry++;
     }
+
+    out = res;
 
     return carry;
+  }
+
+  /**
+    @brief      Inline helper function for biguint multiplication
+                Simply peforms 64-bit multiplication and splits result into two 32-bit words
+    @param[in]  a
+                First operand of multiply
+    @param[in]  b
+                Second operand of multiply
+    @param[out] out_upper
+                Upper word of the product
+    @param[out] out_lower
+                Lower word of the product
+    */
+  inline void multiplyParts(
+    const uint32_t& a,
+    const uint32_t& b,
+    uint32_t& out_upper,
+    uint32_t& out_lower)
+  {
+    uint64_t out = (uint64_t)a * b;
+    out_lower = out & 0xFFFFFFFF;
+    out_upper = out >> 32;
   }
 
   template <unsigned w>
@@ -270,37 +298,55 @@ namespace xu
   {
     biguint res;
 
+    /* product of the two words, split into two words */
+    uint32_t p_upper;
+    uint32_t p_lower;
+
     for (unsigned i = 0; i < w; i++)
     {
-      uint64_t a = words[i];
+      uint32_t a = words[i];
 
       if (a == 0)
       {
         continue;
       }
 
-      /* product of words[i] * other */
-      biguint part;
-
       for (unsigned j = 0; j < w; j++)
       {
-        uint64_t b = other.words[j];
+        uint32_t b = other.words[j];
 
         if (b == 0)
         {
           continue;
         }
 
-        if (i + j >= w)
+        /* this is the word index where the product will go */
+        unsigned k = i + j;
+
+        if (k >= w)
         {
           continue;
         }
 
-        /* add product of words[i] * other.words[j] */
-        part = part + (biguint(a * b) << (WORD_SIZE * (i + j)));
-      }
+        multiplyParts(a, b, p_upper, p_lower);
 
-      res = res + part;
+        /*
+          The product of the parts needs to be added to the total (res) at the
+          correct word index (aka left shift)
+
+          Because the upper word of the product of parts may be nonzero, we need
+          to add that to the result as well. We can do this by adding the lower
+          word first, and then adding the upper word separately. Or, we can
+          add the upper word to the next carry when doing the addition. We will
+          use the latter method
+          */
+        uint32_t carry = p_upper;
+        carry += addCarry(res[k], p_lower, 0, res[k]);
+        while (++k < w and carry > 0)
+        {
+          carry = addCarry(res[k], 0, carry, res[k]);
+        }
+      }
     }
 
     return res;
@@ -349,7 +395,7 @@ namespace xu
   }
 
   template <unsigned w>
-  uint32_t biguint<w>::operator[](unsigned at) const
+  uint32_t& biguint<w>::operator[](unsigned at)
   {
     if (at >= w)
     {

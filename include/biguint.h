@@ -122,6 +122,7 @@ namespace xu
       */
     biguint<w> operator/(const biguint<w>& other) const;
 
+  protected:
     //  =============
     //  Member Access
     //  =============
@@ -134,9 +135,8 @@ namespace xu
       @throw  std::out_of_range
               If index is out of range
       */
-    uint32_t operator[](unsigned at) const;
+    uint32_t& operator[](unsigned at);
 
-  protected:
     //  ================
     //  Helper Functions
     //  ================
