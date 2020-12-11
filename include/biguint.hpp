@@ -424,14 +424,10 @@ namespace xu
       throw std::out_of_range("Bit index is out of range");
     }
 
-    size_t i = 0;
-    while (at >= WORD_SIZE)
-    {
-      at -= WORD_SIZE;
-      i++;
-    }
+    size_t word_idx = at / WORD_SIZE;
+    size_t bit_idx = at % WORD_SIZE;
 
-    return ((words[i] >> at) & 0x1);
+    return ((words[word_idx] >> bit_idx) & 0x1);
   }
 
   template <size_t w>
@@ -442,22 +438,18 @@ namespace xu
       throw std::runtime_error("Bit index out of range");
     }
 
-    size_t i = 0;
-    while (at >= WORD_SIZE)
-    {
-      at -= WORD_SIZE;
-      i++;
-    }
+    size_t word_idx = at / WORD_SIZE;
+    size_t bit_idx = at % WORD_SIZE;
 
-    uint32_t mask = (1 << at);
+    uint32_t bit_msk = (1 << bit_idx);
 
-    if (to == 1)
+    if (to == 0)
     {
-      words[i] = (words[i] & ~mask) | (mask);
+      words[word_idx] &= ~bit_msk;
     }
     else
     {
-      words[i] = (words[i] & ~mask);
+      words[word_idx] = (words[word_idx] & ~bit_msk) | (bit_msk);
     }
   }
 
