@@ -22,6 +22,8 @@
  *  SOFTWARE.
  */
 
+#pragma once
+
 #include "biguint.h"
 
 namespace xu
