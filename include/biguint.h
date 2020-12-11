@@ -116,7 +116,7 @@ namespace xu
 
     /**
       @brief  Divide by another biguint
-              Performs long division. Operation is truncating (round down)
+              Performs long division. Operation is truncating (round towards zero)
       @throw  std::runtime_error
               If divisor is zero
       */
