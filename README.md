@@ -5,6 +5,8 @@
 
 Uses fixed-width integer types from `<cstdint>` internally.
 
+License information can be found in the LICENSE file.
+
 ### Performance
 
 Not intended for highly-optimized applications.
@@ -30,4 +32,3 @@ Rough comparison (on the order of 1 million operations):
 | sum += (a\*b\*c\*d\*e) | **dfloat** | -O3 | 0.868846 | **847:1** |
 | sum += (a/b/c/d/e) | **dfloat** | -O3 | 0.923355 | **821:1** |
 
-License information can be found in the LICENSE file.
