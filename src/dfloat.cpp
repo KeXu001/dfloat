@@ -637,93 +637,83 @@ namespace xu
       stream << '-';
     }
 
-    /* no digits above decimal point */
-    if (pow < 0)
-    {
-      stream << "0.";
 
-      /* 
-        Do not print trailing zeros
-        
-        Start from smallest fractional place. If there is a digit in that place,
-        that's how far we have to print
-      */
-      size_t print_digits = SCALE_POW - pow;
-      uint64_t truncated = mant;
-      for (size_t i = 0; i < SCALE_POW; i++)
+    {
+      /* if pow is zero, how many digits are above/below decimal point */
+      int mant_digits_above = 1;
+      int mant_digits_below = SCALE_POW;
+
+      /* now shift the digits left/right in base-10 */
+      int8_t pow_it = pow;
+      uint64_t divisor = SCALE;
+      while (pow_it > 0)
       {
-        if (truncated % 10 != 0)
+        divisor /= BASE;
+        mant_digits_above++;
+        mant_digits_below--;
+        pow_it--;
+      }
+      while (pow_it < 0)
+      {
+        divisor *= BASE;
+        mant_digits_above--;
+        mant_digits_below++;
+        pow_it++;
+      }
+
+      /* print digits above decimal */
+      if (mant_digits_above > 0)
+      {
+        if (mant_digits_above <= SCALE_POW + 1)
         {
-          break;
+          stream << (mant / divisor);
         }
         else
         {
-          print_digits--;
-          truncated /= 10;
+          stream << std::setw(mant_digits_above) << std::setfill('0') << std::left << mant;
         }
       }
-
-      stream << std::right << std::setw(print_digits) << std::setfill('0') << truncated;
-    }
-
-    /* all mant digits above decimal point */
-    else if (pow >= SCALE_POW)
-    {
-      stream << mant;
-
-      size_t n_zeros = pow - SCALE_POW;
-      for (size_t i = 0; i < n_zeros; i++)
+      else
       {
         stream << '0';
       }
-    }
 
-    /* some digits above, some digits below */
-    else
-    {
-      int8_t place = pow;
-      uint64_t divisor = SCALE * 10;
-      size_t mant_digits_below = SCALE_POW + 1;
-      while (place-- >= 0)
+      /* print below decimal only if there are nonzero digits */
+      if (mant_digits_below > 0)
       {
-        divisor /= 10;
-        mant_digits_below--;
-      }
-
-      stream << (mant / divisor);
-
-      uint64_t below = (mant % divisor);
-
-      /* if there is stuff below the decimal, print it */
-      if (below > 0)
-      {
-        stream << '.';
-
-        /* 
-          Do not print trailing zeros
-          
-          Start from smallest fractional place. If there is a digit in that place,
-          that's how far we have to print
-        */
-        uint64_t truncated = below;
-        uint64_t print_digits = mant_digits_below;
-        for (size_t i = 0; i < mant_digits_below; i++)
+        uint64_t mant_below;
+        int mant_nz_digits_below = mant_digits_below;
+        if (mant_digits_below >= SCALE_POW + 1)
         {
-          if (truncated % 10 != 0)
+          mant_below = mant;
+        }
+        else
+        {
+          mant_below = mant % divisor;
+        }
+
+        /* do not print trailing zeros */
+        for (int8_t i = 0; i < mant_digits_below; i++)
+        {
+          if (mant_below % BASE != 0)
           {
             break;
           }
           else
           {
-            print_digits--;
-            truncated /= 10;
+            mant_nz_digits_below--;
+            mant_below /= BASE;
           }
         }
 
-        stream << std::setw(print_digits) << std::setfill('0') << truncated;
+        if (mant_nz_digits_below > 0)
+        {
+          stream << '.';
+          stream << std::setw(mant_nz_digits_below) << std::setfill('0') << std::right << mant_below;
+        }
       }
     }
-
+    
     /* reset manipulators */
     stream.flags(orig_stream_flags);
 
