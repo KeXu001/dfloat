@@ -5,7 +5,9 @@
 
 Basic arithmetic (`+ - * /`) support. All operations are truncating (round towards zero) beyond 18 digits.
 
-Uses fixed-width integer types from `<cstdint>` internally.
+Requires GCC for `__uint128_t`. Uses fixed-width integer types internally.
+
+Also requires C++11 features.
 
 License information can be found in the LICENSE file.
 
