@@ -201,7 +201,7 @@ namespace xu
   {
     return sign == Sign::ZERO;
   }
-  
+
   dfloat& dfloat::operator+=(const dfloat& other)
   {
     return operator=(operator+(other));
@@ -663,7 +663,7 @@ namespace xu
         }
       }
 
-      stream << std::setw(print_digits) << std::setfill('0') << truncated;
+      stream << std::right << std::setw(print_digits) << std::setfill('0') << truncated;
     }
 
     /* all mant digits above decimal point */
