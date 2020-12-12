@@ -3,14 +3,14 @@
 
 `xu::dfloat` stores a decimal number with 18 digits of precision and exponent between [-128, 127)
 
-Basic arithmetic (`+ - * /`) support. All operations are truncating (round towards zero) beyond 18 digits.
+Basic arithmetic (`+ - * /`) support. All operations are truncating (round towards zero) to 18 digits.
 
-Requires GCC for `__uint128_t`. Uses fixed-width integer types internally.
+Requires GCC's `__uint128_t`. Uses fixed-width integer types internally.
 
-Also requires C++11 features.
+Also requires C++11.
 
 License information can be found in the LICENSE file.
 
 ### Performance
 
-Not intended for highly-optimized applications. This class is slower than double by a factor of about 20:1.
+A rough test suggests that `xu::dfloat` is slower than double by a factor on the order of 20:1.
