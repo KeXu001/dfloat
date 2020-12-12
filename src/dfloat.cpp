@@ -535,7 +535,7 @@ namespace xu
         if (c == '0')
         {
           /* ignore leading zeros */
-          if (nonzero_digits == 0)
+          if (nonzero_digits == 0 and !decimal_point)
           { 
             /* need to set first_char if we are going to continue */
             first_char = false;

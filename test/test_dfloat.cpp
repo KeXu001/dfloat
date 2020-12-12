@@ -89,4 +89,7 @@ int main()
 
   double test = 0.1 * 0.1 * 0.1 - 0.001;
   std::cout << (test == 0) << std::endl;
+
+  dfloat test2 = dfloat("0.1") * dfloat("0.1") * dfloat("0.1") - dfloat("0.001");
+  std::cout << (test2 == 0) << std::endl;
 }
