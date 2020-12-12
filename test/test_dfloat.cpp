@@ -82,4 +82,6 @@ int main()
   std::cout << std::boolalpha << (oneten > 110) << std::endl;
   std::cout << std::boolalpha << (df1 > 110) << std::endl;
   std::cout << std::boolalpha << (df2 > 110) << std::endl;
+
+  std::cout << dfloat("100000000.000000001") << std::endl;
 }
