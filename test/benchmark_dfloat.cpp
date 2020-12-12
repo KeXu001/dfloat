@@ -89,21 +89,21 @@ public:
 
 #define NESTED_LOOP(TYPE, TEST)                                                 \
   START_LOOP(a)                                                                 \
-      START_LOOP(b)                                                             \
-        START_LOOP(c)                                                           \
-          START_LOOP(d)                                                         \
-            START_LOOP(e)                                                       \
-              TEST(                                                             \
-                TYPE(data[a]),                                                  \
-                TYPE(data[b]),                                                  \
-                TYPE(data[c]),                                                  \
-                TYPE(data[d]),                                                  \
-                TYPE(data[e]))                                                  \
-            END_LOOP()                                                          \
+    START_LOOP(b)                                                               \
+      START_LOOP(c)                                                             \
+        START_LOOP(d)                                                           \
+          START_LOOP(e)                                                         \
+            TEST(                                                               \
+              TYPE(data[a]),                                                    \
+              TYPE(data[b]),                                                    \
+              TYPE(data[c]),                                                    \
+              TYPE(data[d]),                                                    \
+              TYPE(data[e]))                                                    \
           END_LOOP()                                                            \
         END_LOOP()                                                              \
       END_LOOP()                                                                \
-    END_LOOP()
+    END_LOOP()                                                                  \
+  END_LOOP()
 
 #define DO_TEST(TYPE, TEST, LABEL)                                              \
   {                                                                             \
