@@ -631,6 +631,7 @@ namespace xu
 
     /* save current format flags so we can reset our manipulators when we are done */
     std::ios_base::fmtflags orig_stream_flags(stream.flags());
+    stream << std::resetiosflags(orig_stream_flags);
 
     if (sign == Sign::NEGATIVE)
     {
@@ -713,7 +714,7 @@ namespace xu
         }
       }
     }
-    
+
     /* reset manipulators */
     stream.flags(orig_stream_flags);
 
