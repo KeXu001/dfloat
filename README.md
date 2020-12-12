@@ -13,4 +13,4 @@ License information can be found in the LICENSE file.
 
 ### Performance
 
-A rough test suggests that `xu::dfloat` is slower than double by a factor on the order of 20:1.
+A rough test suggests that `xu::dfloat` is slower than `double` by a factor on the order of 20:1.
