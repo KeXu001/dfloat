@@ -258,7 +258,7 @@ namespace xu
       @note   Output is always in decimal notation (never scientific notation)
       */
     std::ostream& print(std::ostream& stream) const;
-  };
+  } __attribute__((packed));
 
 }
 

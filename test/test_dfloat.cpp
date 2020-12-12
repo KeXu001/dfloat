@@ -32,6 +32,8 @@ typedef xu::dfloat dfloat;
 
 int main()
 {
+  std::cout << "sizeof(dfloat)=" << sizeof(dfloat) << std::endl;
+
   // dfloat df1(1152921504606846976ul);
 
   // dfloat df2(1152921504606846976ul);
