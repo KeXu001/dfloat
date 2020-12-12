@@ -105,7 +105,7 @@ public:
       END_LOOP()                                                                \
     END_LOOP()
 
-#define DO_TEST(TYPE, TEST)                                                     \
+#define DO_TEST(TYPE, TEST, LABEL)                                              \
   {                                                                             \
     size_t count = data.count();                                                \
     TYPE sum = 0;                                                               \
@@ -115,9 +115,10 @@ public:
                                                                                 \
     NESTED_LOOP(TYPE, TEST);                                                    \
                                                                                 \
-    std::cout << "Results for " << #TYPE << ":" << std::endl;                   \
-    std::cout << "  elapsed: " << t.stop() << std::endl;                        \
-    std::cout << "  sum:     " << sum << std::endl;                             \
+    std::cout << #TYPE << '\t';                                                 \
+    std::cout << LABEL << '\t';                                                 \
+    std::cout << std::setw(8) << std::left << t.stop() << '\t';                 \
+    std::cout << sum << std::endl;                                              \
   }
 
 int main(int argc, char* argv[])
@@ -140,7 +141,19 @@ int main(int argc, char* argv[])
     std::cout << "Read " << data.count() << " numbers from file" << std::endl;
   }
 
-  DO_TEST(double, TEST_SUBTRACT);
+  DO_TEST(double, TEST_ADD, "+");
   
-  DO_TEST(dfloat, TEST_SUBTRACT);
+  DO_TEST(dfloat, TEST_ADD, "+");
+
+  DO_TEST(double, TEST_SUBTRACT, "-");
+  
+  DO_TEST(dfloat, TEST_SUBTRACT, "-");
+
+  DO_TEST(double, TEST_MULTIPLY, "*");
+  
+  DO_TEST(dfloat, TEST_MULTIPLY, "*");
+
+  DO_TEST(double, TEST_DIVIDE, "/");
+  
+  DO_TEST(dfloat, TEST_DIVIDE, "/");
 }

@@ -379,11 +379,11 @@ namespace xu
     res.sign = (sign == other.sign) ? Sign::POSITIVE : Sign::NEGATIVE;
     res.pow = pow + other.pow;
 
-    biguint<4> a(mant);
-    biguint<4> b(other.mant);
+    __uint128_t a = mant;
+    __uint128_t b = other.mant;
 
     /*
-      We can demote from biguint to uint64_t because 
+      We can demote from __uint128_t to uint64_t because 
         99 million billion * 99 million billion / 100 million billion
         is less than 2^64 - 1
     */
@@ -416,13 +416,13 @@ namespace xu
     res.sign = (sign == other.sign) ? Sign::POSITIVE : Sign::NEGATIVE;
     res.pow = pow - other.pow;
 
-    biguint<4> a(mant);
-    biguint<4> b(other.mant);
+    __uint128_t a = mant;
+    __uint128_t b = other.mant;
 
     /* make it so that numerator is >= denominator, that way quotient will be between 1 and 10 */
     if (a < b)
     {
-      a = a * biguint<4>(BASE);
+      a = a * BASE;
       res.pow--;
     }
 

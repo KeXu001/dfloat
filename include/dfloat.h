@@ -28,7 +28,6 @@
 #include <iomanip>
 #include <ostream>
 #include <string>
-#include "biguint.hpp"
 
 namespace xu
 {
@@ -188,13 +187,13 @@ namespace xu
 
     /**
       @brief  Multiply by a dfloat
-      @note   Uses biguint to perform 128-bit multiplication
+      @note   Uses __uint128_t to perform 128-bit multiplication
       */
     dfloat operator*(const dfloat& other) const;
 
     /**
       @brief  Divide by a dfloat
-      @note   Uses biguint to perform 128-bit division
+      @note   Uses __uint128_t to perform 128-bit division
       @throw  std::runtime_error
               If divisor is zero
       */
