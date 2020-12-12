@@ -152,8 +152,6 @@ namespace xu
     //  Assignment Operators
     //  ====================
 
-    // dfloat& operator=(const dfloat& other);
-
     dfloat& operator+=(const dfloat& other);
 
     dfloat& operator-=(const dfloat& other);

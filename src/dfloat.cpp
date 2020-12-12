@@ -128,7 +128,7 @@ namespace xu
     /*
       I think there may be rounding errors when converting value to mant
       Let's do a final check in case
-    */
+      */
     while (mant < SCALE)
     {
       mant *= BASE;
@@ -148,9 +148,10 @@ namespace xu
 
     /*
       Multiply by 10^pow
-      This should be safe because IEEE754 uses 11 bits for the exponent while
-      we only use 8
-    */
+      This should be safe because IEEE754 uses 11 bits for the base-2 exponent
+      and we use 8 bits for the base-10 exponent
+        log10(2^(2^11)) >= log10(10^(2^8))
+      */
     unsigned pow_to_zero = pow;
     while (pow_to_zero > 0)
     {
@@ -200,12 +201,7 @@ namespace xu
   {
     return sign == Sign::ZERO;
   }
-
-  // dfloat& dfloat::operator=(const dflaot& other)
-  // {
-
-  // }
-
+  
   dfloat& dfloat::operator+=(const dfloat& other)
   {
     return operator=(operator+(other));
