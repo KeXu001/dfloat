@@ -22,16 +22,20 @@
  *  SOFTWARE.
  */
 
+#pragma once
+
 #include "dfloat.h"
 
 namespace xu
 {
+  inline
   dfloat::dfloat()
     : sign(Sign::ZERO)
   {
 
   }
 
+  inline
   dfloat::dfloat(const dfloat& other)
     : sign(other.sign),
       mant(other.mant),
@@ -40,6 +44,7 @@ namespace xu
 
   }
 
+  inline
   dfloat::dfloat(Sign sign_, uint64_t mant_, int8_t pow_)
     : sign(sign_),
       mant(mant_),
@@ -48,18 +53,21 @@ namespace xu
 
   }
 
+  inline
   dfloat::dfloat(int value)
     : dfloat((long long)value)
   {
 
   }
 
+  inline
   dfloat::dfloat(long value)
     : dfloat((long long)value)
   {
 
   }
 
+  inline
   dfloat::dfloat(long long value)
   {
     if (value == 0)
@@ -92,6 +100,7 @@ namespace xu
     }
   }
 
+  inline
   dfloat::dfloat(double value)
   {
     if (value == 0)
@@ -141,7 +150,8 @@ namespace xu
     }
   }
 
-  dfloat:: operator double() const
+  inline
+  dfloat::operator double() const
   {
     double res = mant;
     res /= SCALE;
@@ -167,61 +177,73 @@ namespace xu
     return res;
   }
 
+  inline
   bool dfloat::operator==(const dfloat& other) const
   {
     return 0 == _comparedTo(other);
   }
 
+  inline
   bool dfloat::operator!=(const dfloat& other) const
   {
     return 0 != _comparedTo(other);
   }
 
+  inline
   bool dfloat::operator>(const dfloat& other) const
   {
     return 1 == _comparedTo(other);
   }
 
+  inline
   bool dfloat::operator<(const dfloat& other) const
   {
     return -1 == _comparedTo(other);
   }
 
+  inline
   bool dfloat::operator>=(const dfloat& other) const
   {
     return 0 <= _comparedTo(other);
   }
 
+  inline
   bool dfloat::operator<=(const dfloat& other) const
   {
     return 0 >= _comparedTo(other);
   }
 
+  inline
   bool dfloat::isZero() const
   {
     return sign == Sign::ZERO;
   }
 
+  inline
   dfloat& dfloat::operator+=(const dfloat& other)
   {
     return operator=(operator+(other));
   }
 
+  inline
   dfloat& dfloat::operator-=(const dfloat& other)
   {
     return operator=(operator-(other));
   }
 
+  inline
   dfloat& dfloat::operator*=(const dfloat& other)
   {
     return operator=(operator*(other));
   }
   
+  inline
   dfloat& dfloat::operator/=(const dfloat& other)
   {
     return operator=(operator/(other));
   }
 
+  inline
   dfloat dfloat::operator-() const
   {
     if (sign == Sign::POSITIVE)
@@ -238,6 +260,7 @@ namespace xu
     }
   }
 
+  inline
   dfloat dfloat::operator+(const dfloat& other) const
   {
     /* edge case: lhs is zero */
@@ -358,11 +381,13 @@ namespace xu
     }
   }
 
+  inline
   dfloat dfloat::operator-(const dfloat& other) const
   {
     return operator+(-other);
   }
 
+  inline
   dfloat dfloat::operator*(const dfloat& other) const
   {
     /* edge case: either is zero */
@@ -394,6 +419,7 @@ namespace xu
     return res;
   }
 
+  inline
   dfloat dfloat::operator/(const dfloat& other) const
   {
     /* edge case: numerator is zero */
@@ -428,6 +454,7 @@ namespace xu
     return res;
   }
 
+  inline
   short dfloat::_comparedTo(const dfloat& other) const
   {
     if (sign == Sign::ZERO and other.sign == Sign::ZERO)
@@ -454,6 +481,7 @@ namespace xu
     }
   }
 
+  inline
   short dfloat::_compareMagnitudeTo(const dfloat& other) const
   {
     /* edge cases: one or more of the operands are zero */
@@ -496,6 +524,7 @@ namespace xu
     }
   }
 
+  inline
   dfloat::dfloat(const std::string& str)
   {
     /* edge case: str is empty */
@@ -620,6 +649,7 @@ namespace xu
     }
   }
 
+  inline
   std::ostream& dfloat::print(std::ostream& stream) const
   {
     /* edge case - zero */
@@ -722,6 +752,7 @@ namespace xu
   }
 }
 
+inline
 std::ostream& operator<<(std::ostream& stream, const xu::dfloat& d)
 {
   return d.print(stream);

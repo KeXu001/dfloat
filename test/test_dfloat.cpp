@@ -24,7 +24,8 @@
 
 #include <iomanip>
 #include <iostream>
-#include "dfloat.h"
+#include "dfloat.hpp"
+#include "other_class.h"
 
 #define MAX32 4294967295
 
@@ -87,9 +88,19 @@ int main()
 
   std::cout << dfloat("100000000.000000001") << std::endl;
 
-  double test = 0.1 * 0.1 * 0.1 - 0.001;
+  double test = 0.1l * 0.1l - 0.01l;
   std::cout << (test == 0) << std::endl;
 
-  dfloat test2 = dfloat("0.1") * dfloat("0.1") * dfloat("0.1") - dfloat("0.001");
+  dfloat test2 = dfloat("0.1") * dfloat("0.1") - dfloat("0.01");
   std::cout << (test2 == 0) << std::endl;
+
+  double test3 = 0.4l * 0.4l - 0.16l;
+  std::cout << test3 << std::endl;
+
+  dfloat test4 = dfloat("0.4") * dfloat("0.4") - dfloat("0.16");
+  std::cout << test4 << std::endl;
+
+  other_class oc;
+
+  std::cout << oc.get() << std::endl;
 }
