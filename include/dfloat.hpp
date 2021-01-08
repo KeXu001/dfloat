@@ -650,6 +650,16 @@ namespace xu
   }
 
   inline
+  dfloat::operator std::string() const
+  {
+    std::stringstream ss;
+
+    print(ss);
+
+    return ss.str();
+  }
+
+  inline
   std::ostream& dfloat::print(std::ostream& stream) const
   {
     /* edge case - zero */

@@ -27,6 +27,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <ostream>
+#include <sstream>
 #include <string>
 
 namespace xu
@@ -252,6 +253,11 @@ namespace xu
               If format is not understood
       */
     dfloat(const std::string& str);
+
+    /**
+      @brief  Convert to string
+      */
+    explicit operator std::string() const;
 
     /**
       @brief  Converts dfloat to string on stream
