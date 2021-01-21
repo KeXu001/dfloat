@@ -461,6 +461,14 @@ namespace xu
     {
       return 0;
     }
+    else if (sign == Sign::ZERO and other.sign == Sign::POSITIVE)
+    {
+      return -1;
+    }
+    else if (sign == Sign::ZERO and other.sign == Sign::NEGATIVE)
+    {
+      return 1;
+    }
     else if (sign == Sign::POSITIVE and other.sign != Sign::POSITIVE)
     {
       return 1;
