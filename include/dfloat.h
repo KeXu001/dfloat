@@ -289,6 +289,42 @@ namespace xu
     */
   template <typename T>
   dfloat operator/(T x, const dfloat& d);
+
+  /**
+    @brief  operator== free function with dfloat as right operand
+    */
+  template <typename T>
+  bool operator==(T x, const dfloat& d);
+
+  /**
+    @brief  operator!= free function with dfloat as right operand
+    */
+  template <typename T>
+  bool operator!=(T x, const dfloat& d);
+
+  /**
+    @brief  operator> free function with dfloat as right operand
+    */
+  template <typename T>
+  bool operator>(T x, const dfloat& d);
+
+  /**
+    @brief  operator< free function with dfloat as right operand
+    */
+  template <typename T>
+  bool operator<(T x, const dfloat& d);
+
+  /**
+    @brief  operator>= free function with dfloat as right operand
+    */
+  template <typename T>
+  bool operator>=(T x, const dfloat& d);
+
+  /**
+    @brief  operator<= free function with dfloat as right operand
+    */
+  template <typename T>
+  bool operator<=(T x, const dfloat& d);
 }
 
 /**

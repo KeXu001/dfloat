@@ -796,6 +796,63 @@ namespace xu
   {
     return dfloat(x) / d;
   }
+
+  template <typename T>
+  inline
+  bool operator==(T x, const dfloat& d)
+  {
+    return dfloat(x) == d;
+  }
+
+  /**
+    @brief  operator!= free function with dfloat as right operand
+    */
+  template <typename T>
+  inline
+  bool operator!=(T x, const dfloat& d)
+  {
+    return dfloat(x) != d;
+  }
+
+  /**
+    @brief  operator> free function with dfloat as right operand
+    */
+  template <typename T>
+  inline
+  bool operator>(T x, const dfloat& d)
+  {
+    return dfloat(x) > d;
+  }
+
+  /**
+    @brief  operator< free function with dfloat as right operand
+    */
+  template <typename T>
+  inline
+  bool operator<(T x, const dfloat& d)
+  {
+    return dfloat(x) < d;
+  }
+
+  /**
+    @brief  operator>= free function with dfloat as right operand
+    */
+  template <typename T>
+  inline
+  bool operator>=(T x, const dfloat& d)
+  {
+    return dfloat(x) >= d;
+  }
+
+  /**
+    @brief  operator<= free function with dfloat as right operand
+    */
+  template <typename T>
+  inline
+  bool operator<=(T x, const dfloat& d)
+  {
+    return dfloat(x) <= d;
+  }
 }
 
 inline

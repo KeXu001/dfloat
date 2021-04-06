@@ -105,6 +105,8 @@ int main()
   std::cout << oc.get() << std::endl;
 
   std::cout << (dfloat("20") * 0.1) << "==?" << (0.1 * dfloat("20")) << std::endl;
-
   std::cout << (dfloat("20") + 16) << "==?" << (16 + dfloat("20")) << std::endl;
+
+  std::cout << (dfloat("78.5") <= 78.5) << std::endl;
+  std::cout << (78.5 >= dfloat("78.5")) << std::endl;
 }
