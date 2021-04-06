@@ -103,4 +103,8 @@ int main()
   other_class oc;
 
   std::cout << oc.get() << std::endl;
+
+  std::cout << (dfloat("20") * 0.1) << "==?" << (0.1 * dfloat("20")) << std::endl;
+
+  std::cout << (dfloat("20") + 16) << "==?" << (16 + dfloat("20")) << std::endl;
 }

@@ -266,6 +266,29 @@ namespace xu
     std::ostream& print(std::ostream& stream) const;
   } __attribute__((packed));
 
+  /**
+    @brief  operator+ free function with dfloat as right operand
+    */
+  template <typename T>
+  dfloat operator+(T x, const dfloat& d);
+
+  /**
+    @brief  operator- free function with dfloat as right operand
+    */
+  template <typename T>
+  dfloat operator-(T x, const dfloat& d);
+
+  /**
+    @brief  operator* free function with dfloat as right operand
+    */
+  template <typename T>
+  dfloat operator*(T x, const dfloat& d);
+
+  /**
+    @brief  operator/ free function with dfloat as right operand
+    */
+  template <typename T>
+  dfloat operator/(T x, const dfloat& d);
 }
 
 /**

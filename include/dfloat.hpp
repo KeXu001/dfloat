@@ -768,6 +768,34 @@ namespace xu
 
     return stream;
   }
+
+  template <typename T>
+  inline
+  dfloat operator+(T x, const dfloat& d)
+  {
+    return dfloat(x) + d;
+  }
+
+  template <typename T>
+  inline
+  dfloat operator-(T x, const dfloat& d)
+  {
+    return dfloat(x) - d;
+  }
+
+  template <typename T>
+  inline
+  dfloat operator*(T x, const dfloat& d)
+  {
+    return dfloat(x) * d;
+  }
+
+  template <typename T>
+  inline
+  dfloat operator/(T x, const dfloat& d)
+  {
+    return dfloat(x) / d;
+  }
 }
 
 inline
