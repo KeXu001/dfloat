@@ -53,11 +53,41 @@ int main()
 
   dfloat df3("012310123409010203040.506070809");
 
+  dfloat df4(110.0f);
+
+  int16_t x5 = -32768;
+  dfloat df5(x5);
+  uint16_t x6 = 65535;
+  dfloat df6(x6);
+  int32_t x7 = -2147483648;
+  dfloat df7(x7);
+  uint32_t x8 = 4294967295;
+  dfloat df8(x8);
+  int64_t x9 = -9223372036854775808ul;
+  dfloat df9(x9);
+  uint64_t x10 = 18446744073709551615ull;
+  dfloat df10(x10);
+  long long x11 = -9223372036854775808ul;
+  dfloat df11(x11);
+  unsigned long long x12 = 18446744073709551615ull;
+  dfloat df12(x12);
+
   std::cout << "df1=" << df1 << std::endl;
 
   std::cout << "df2=" << df2 << std::endl;
 
   std::cout << "df3=" << df3 << std::endl;
+
+  std::cout << "df4=" << df4 << std::endl;
+
+  std::cout << "df5=" << df5 << std::endl;
+  std::cout << "df6=" << df6 << std::endl;
+  std::cout << "df7=" << df7 << std::endl;
+  std::cout << "df8=" << df8 << std::endl;
+  std::cout << "df9=" << df9 << std::endl;
+  std::cout << "df10=" << df10 << std::endl;
+  std::cout << "df11=" << df11 << std::endl;
+  std::cout << "df12=" << df12 << std::endl;
 
   std::cout << (df1 * df2) << std::endl;
 

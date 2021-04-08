@@ -53,22 +53,18 @@ namespace xu
 
   }
 
+  template <
+    typename T,
+    typename std::enable_if_t<std::is_integral<T>::value, bool> = true>
   inline
-  dfloat::dfloat(int value)
-    : dfloat((long long)value)
+  dfloat::dfloat(T value)
+    : dfloat((int64_t)value)
   {
-
+    
   }
 
   inline
-  dfloat::dfloat(long value)
-    : dfloat((long long)value)
-  {
-
-  }
-
-  inline
-  dfloat::dfloat(long long value)
+  dfloat::dfloat(int64_t value)
   {
     if (value == 0)
     {
@@ -101,7 +97,93 @@ namespace xu
   }
 
   inline
+  dfloat::dfloat(uint64_t value)
+  {
+    std::cout << "here" << std::endl;
+
+    if (value == 0)
+    {
+      sign = Sign::ZERO;
+      return;
+    }
+    else
+    {
+      sign = Sign::POSITIVE;
+      mant = value;
+    }    
+
+    pow = SCALE_POW;
+    while (mant < SCALE)
+    {
+      mant *= BASE;
+      pow--;
+    }
+    while (mant >= MANT_CAP)
+    {
+      mant /= BASE;
+      pow++;
+    }
+  }
+
+  inline
+  dfloat::dfloat(unsigned long long value)
+    : dfloat((uint64_t)value)
+  {
+
+  }
+
+  inline
   dfloat::dfloat(double value)
+  {
+    if (value == 0)
+    {
+      sign = Sign::ZERO;
+      return;
+    }
+
+    if (value > 0)
+    {
+      sign = Sign::POSITIVE;
+    }
+    else
+    {
+      sign = Sign::NEGATIVE;
+      value = -value;
+    }
+
+    /* scale value until it's between 1 and 10 */
+    pow = 0;
+    while (value < 1)
+    {
+      value *= BASE;
+      pow--;
+    }
+    while (value >= BASE)
+    {
+      value /= BASE;
+      pow++;
+    }
+
+    mant = (uint64_t)(value * SCALE);
+
+    /*
+      I think there may be rounding errors when converting value to mant
+      Let's do a final check in case
+      */
+    while (mant < SCALE)
+    {
+      mant *= BASE;
+      pow--;
+    }
+    while (mant >= MANT_CAP)
+    {
+      mant /= BASE;
+      pow++;
+    }
+  }
+
+  inline
+  dfloat::dfloat(float value)
   {
     if (value == 0)
     {

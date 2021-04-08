@@ -26,6 +26,7 @@
 
 #include <cstdint>
 #include <iomanip>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -121,13 +122,24 @@ namespace xu
     //  Conversions
     //  ===========
 
-    dfloat(int value);
+    /* must fit into a long long */
+    template <
+      typename T,
+      typename std::enable_if_t<std::is_integral<T>::value, bool> = true>
+    dfloat(T value);
 
-    dfloat(long value);
+    /* default logic for integral types */
+    dfloat(int64_t value);
 
-    dfloat(long long value);
+    /* uint64_t won't fit into int64_t, so have a special overload */
+    dfloat(uint64_t value);
+
+    /* since on some systems, uint64_t may be defined as `unsigned long` instead of `unsigned long long`, have another overload */
+    dfloat(unsigned long long value);
 
     dfloat(double value);
+
+    dfloat(float value);
 
     explicit operator double() const;
 
