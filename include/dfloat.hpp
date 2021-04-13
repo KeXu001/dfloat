@@ -30,7 +30,9 @@ namespace xu
 {
   inline
   dfloat::dfloat()
-    : sign(Sign::ZERO)
+    : sign(Sign::ZERO),
+      mant(0),
+      pow(0)
   {
 
   }
