@@ -22,6 +22,7 @@
  *  SOFTWARE.
  */
 
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include "dfloat.hpp"
@@ -139,4 +140,17 @@ int main()
 
   std::cout << (dfloat("78.5") <= 78.5) << std::endl;
   std::cout << (78.5 >= dfloat("78.5")) << std::endl;
+
+  assert(dfloat("10") + dfloat("20") == dfloat("30"));
+  assert(dfloat("10") - dfloat("20") == dfloat("-10"));
+  assert(dfloat("10") + dfloat("10") == dfloat("20"));
+  assert(dfloat("10") - dfloat("10") == dfloat("0"));
+
+  assert(-dfloat("12345") == dfloat("-12345"));
+  assert(-dfloat("0") == dfloat("0"));
+
+  assert(dfloat("123") * dfloat("123") == dfloat("15129"));
+  assert(-dfloat("123") * dfloat("123") == dfloat("-15129"));
+  assert(dfloat("1000") / dfloat("250") == dfloat("4"));
+  assert(dfloat("1000") / -dfloat("1000") == dfloat("-1"));
 }

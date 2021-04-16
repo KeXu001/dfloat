@@ -89,12 +89,12 @@ namespace xu
     while (mant < SCALE)
     {
       mant *= BASE;
-      pow--;
+      --pow;
     }
     while (mant >= MANT_CAP)
     {
       mant /= BASE;
-      pow++;
+      ++pow;
     }
   }
 
@@ -118,12 +118,12 @@ namespace xu
     while (mant < SCALE)
     {
       mant *= BASE;
-      pow--;
+      --pow;
     }
     while (mant >= MANT_CAP)
     {
       mant /= BASE;
-      pow++;
+      ++pow;
     }
   }
 
@@ -158,12 +158,12 @@ namespace xu
     while (value < 1)
     {
       value *= BASE;
-      pow--;
+      --pow;
     }
     while (value >= BASE)
     {
       value /= BASE;
-      pow++;
+      ++pow;
     }
 
     mant = (uint64_t)(value * SCALE);
@@ -175,12 +175,12 @@ namespace xu
     while (mant < SCALE)
     {
       mant *= BASE;
-      pow--;
+      --pow;
     }
     while (mant >= MANT_CAP)
     {
       mant /= BASE;
-      pow++;
+      ++pow;
     }
   }
 
@@ -208,12 +208,12 @@ namespace xu
     while (value < 1)
     {
       value *= BASE;
-      pow--;
+      --pow;
     }
     while (value >= BASE)
     {
       value /= BASE;
-      pow++;
+      ++pow;
     }
 
     mant = (uint64_t)(value * SCALE);
@@ -225,12 +225,12 @@ namespace xu
     while (mant < SCALE)
     {
       mant *= BASE;
-      pow--;
+      --pow;
     }
     while (mant >= MANT_CAP)
     {
       mant /= BASE;
-      pow++;
+      ++pow;
     }
   }
 
@@ -250,12 +250,12 @@ namespace xu
     while (pow_to_zero > 0)
     {
       res *= BASE;
-      pow_to_zero--;
+      --pow_to_zero;
     }
     while (pow_to_zero < 0)
     {
       res /= BASE;
-      pow_to_zero++;
+      ++pow_to_zero;
     }
 
     return res;
@@ -372,28 +372,25 @@ namespace xu
       int8_t b_pow = other.pow;
 
       /* scale the smaller magnitude number to match the larger magnitude number */
-      while (a_pow != b_pow)
+      while (a_pow < b_pow)
       {
-        if (a_pow < b_pow)
-        {
-          a_pow++;
-          a_mant /= BASE;
-        }
-        else if (a_pow > b_pow)
-        {
-          b_pow++;
-          b_mant /= BASE;
-        }
+        ++a_pow;
+        a_mant /= BASE;
+      }
+      while (a_pow > b_pow)
+      {
+        ++b_pow;
+        b_mant /= BASE;
       }
 
       res.pow = a_pow;
 
       res.mant = a_mant + b_mant;
 
-      while (res.mant >= MANT_CAP)
+      if (res.mant >= MANT_CAP)
       {
         res.mant /= BASE;
-        res.pow++;
+        ++res.pow;
       }
 
       return res;
@@ -404,9 +401,6 @@ namespace xu
     {
       dfloat res;
 
-      uint64_t a_mant, b_mant;
-      int8_t a_pow, b_pow;
-
       short compare = _compareMagnitudeTo(other);
 
       /* equal but opposite */
@@ -414,8 +408,13 @@ namespace xu
       {
         return res;
       }
+
+      /* a will hold the larger magnitude number */
+      uint64_t a_mant, b_mant;
+      int8_t a_pow, b_pow;
+
       /* this is larger magnitude than other */
-      else if (compare > 0)
+      if (compare > 0)
       {
         a_mant = mant;
         a_pow = pow;
@@ -436,18 +435,10 @@ namespace xu
       }
 
       /* scale the smaller magnitude number to match the larger magnitude number */
-      while (a_pow != b_pow)
+      while (a_pow > b_pow)
       {
-        if (a_pow < b_pow)
-        {
-          a_pow++;
-          a_mant /= BASE;
-        }
-        else if (a_pow > b_pow)
-        {
-          b_pow++;
-          b_mant /= BASE;
-        }
+        ++b_pow;
+        b_mant /= BASE;
       }
 
       res.pow = a_pow;
@@ -455,10 +446,11 @@ namespace xu
       /* at this point, a_mant should be bigger than b_mant, so it's safe to do an unsigned subtraction */
       res.mant = a_mant - b_mant;
 
+      /* the difference may be small, i.e. below SCALE */
       while (res.mant < SCALE)
       {
         res.mant *= BASE;
-        res.pow--;
+        --res.pow;
       }
 
       return res;
@@ -497,7 +489,7 @@ namespace xu
     if (res.mant >= MANT_CAP)
     {
       res.mant /= BASE;
-      res.pow++;
+      ++res.pow;
     }
 
     return res;
@@ -529,7 +521,7 @@ namespace xu
     if (a < b)
     {
       a = a * BASE;
-      res.pow--;
+      --res.pow;
     }
 
     /* multiply the numerator by scale before dividing */
@@ -782,16 +774,16 @@ namespace xu
       while (pow_it > 0)
       {
         divisor /= BASE;
-        mant_digits_above++;
-        mant_digits_below--;
-        pow_it--;
+        ++mant_digits_above;
+        --mant_digits_below;
+        --pow_it;
       }
       while (pow_it < 0)
       {
         divisor *= BASE;
-        mant_digits_above--;
-        mant_digits_below++;
-        pow_it++;
+        --mant_digits_above;
+        ++mant_digits_below;
+        ++pow_it;
       }
 
       /* print digits above decimal */
@@ -834,7 +826,7 @@ namespace xu
           }
           else
           {
-            mant_nz_digits_below--;
+            --mant_nz_digits_below;
             mant_below /= BASE;
           }
         }
