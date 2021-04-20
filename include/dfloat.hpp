@@ -101,8 +101,6 @@ namespace xu
   inline
   dfloat::dfloat(uint64_t value)
   {
-    std::cout << "here" << std::endl;
-
     if (value == 0)
     {
       sign = Sign::ZERO;
