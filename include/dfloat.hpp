@@ -246,7 +246,7 @@ namespace xu
       and we use 8 bits for the base-10 exponent
         log10(2^(2^11)) >= log10(10^(2^8))
       */
-    unsigned pow_to_zero = pow;
+    int8_t pow_to_zero = pow;
     while (pow_to_zero > 0)
     {
       res *= BASE;
