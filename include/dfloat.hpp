@@ -235,6 +235,11 @@ namespace xu
   inline
   dfloat::operator double() const
   {
+    if (sign == Sign::ZERO)
+    {
+      return 0;
+    }
+
     double res = mant;
     res /= SCALE;
 
@@ -256,7 +261,14 @@ namespace xu
       ++pow_to_zero;
     }
 
-    return res;
+    if (sign == Sign::POSITIVE)
+    {
+      return res;
+    }
+    else
+    {
+      return -res;
+    }
   }
 
   inline

@@ -153,4 +153,6 @@ int main()
   assert(-dfloat("123") * dfloat("123") == dfloat("-15129"));
   assert(dfloat("1000") / dfloat("250") == dfloat("4"));
   assert(dfloat("1000") / -dfloat("1000") == dfloat("-1"));
+
+  assert((double)(dfloat("0.2") - dfloat("0.3")) == -0.1);
 }
