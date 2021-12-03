@@ -756,6 +756,13 @@ namespace xu
   inline
   std::ostream& dfloat::print(std::ostream& stream) const
   {
+    /* edge case - nan */
+    if (sign == Sign::_NAN_)
+    {
+      stream << "NaN";
+      return stream;
+    }
+    
     /* edge case - zero */
     if (sign == Sign::ZERO)
     {

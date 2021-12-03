@@ -166,6 +166,7 @@ int main()
   std::cout << dfloat((float)dfloat("0.2")) << std::endl;
   
   dfloat nan = dfloat(1)/dfloat(0);
+  std::cout << nan << std::endl;
   
   assert(!dfloat::isNaN(dfloat(0)));
   assert(dfloat::isNaN(dfloat(NAN)));
