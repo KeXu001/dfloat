@@ -197,4 +197,27 @@ int main()
   assert(dfloat::isNaN(dfloat("--1")));
   assert(dfloat::isNaN(dfloat("1e10")));
   assert(dfloat::isNaN(dfloat("+5")));
+  
+  assert(!dfloat::isNaN(dfloat(1e127) + dfloat(89999999e127)));
+  assert(!dfloat::isNaN(dfloat(1e127) + dfloat(89999999e127)));
+  assert(dfloat::isNaN(dfloat(1e127) + dfloat(9e127)));
+  
+  assert(dfloat::isNaN(dfloat(1.2e-128) - dfloat(1e-128)));
+  assert(!dfloat::isNaN(dfloat(1.2e-128) - dfloat(1.2e-128)));
+  // assert(!dfloat::isNaN(dfloat(2.2e-128) - dfloat(1.2e-128)));  // TODO: this doesn't work because 2.2e-128 ends up being 2.19999...
+  
+  assert(dfloat::isNaN(dfloat(1e-128) / dfloat(2)));
+  assert(!dfloat::isNaN(dfloat(1e-128) / dfloat(1)));
+  
+  assert(!dfloat::isNaN(dfloat(1e100)*dfloat(1e27)));
+  assert(!dfloat::isNaN(dfloat(1e-100)*dfloat(1e-28)));
+  
+  assert(dfloat::isNaN(dfloat(1e100)*dfloat(1e28)));
+  assert(dfloat::isNaN(dfloat(1e-100)*dfloat(1e-29)));
+  
+  assert(dfloat::isNaN(dfloat(1e100)/dfloat(1e-28)));
+  assert(dfloat::isNaN(dfloat(1e-100)/dfloat(1e29)));
+  
+  assert(dfloat::isNaN(dfloat(5e100)*dfloat(2e27)));
+  assert(!dfloat::isNaN(dfloat(5e-100)*dfloat(2e-29)));
 }

@@ -363,7 +363,16 @@ namespace xu
       if (res.mant >= MANT_CAP)
       {
         res.mant /= BASE;
-        ++res.pow;
+        
+        /* overflow results in NaN */
+        if (res.pow >= MAX_POW)
+        {
+          res.sign = Sign::_NAN_;
+        }
+        else
+        {
+          ++res.pow;
+        }
       }
 
       return res;
@@ -423,7 +432,17 @@ namespace xu
       while (res.mant < SCALE)
       {
         res.mant *= BASE;
-        --res.pow;
+        
+        /* overflow results in NaN */
+        if (res.pow <= MIN_POW)
+        {
+          res.sign = Sign::_NAN_;
+          break;
+        }
+        else
+        {
+          --res.pow;
+        }
       }
 
       return res;
@@ -439,7 +458,7 @@ namespace xu
   inline
   dfloat dfloat::operator*(const dfloat& other) const
   {
-    /* edge case: either is nan */
+    /* edge case: either is NaN */
     if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
     {
       return dfloat(Sign::_NAN_, 0, 0);
@@ -450,10 +469,11 @@ namespace xu
     {
       return dfloat();
     }
-
+    
     dfloat res;
     res.sign = (sign == other.sign) ? Sign::POS : Sign::NEG;
-    res.pow = pow + other.pow;
+    
+    int16_t new_pow = (int16_t)pow + (int16_t)other.pow;  // wider type in order to bounds check after final touches
 
     __uint128_t a = mant;
     __uint128_t b = other.mant;
@@ -468,7 +488,17 @@ namespace xu
     if (res.mant >= MANT_CAP)
     {
       res.mant /= BASE;
-      ++res.pow;
+      ++new_pow;
+    }
+    
+    /* overflow results in NaN */
+    if (new_pow > MAX_POW or new_pow < MIN_POW)
+    {
+      res.sign = Sign::_NAN_;
+    }
+    else
+    {
+      res.pow = new_pow;
     }
 
     return res;
@@ -477,7 +507,7 @@ namespace xu
   inline
   dfloat dfloat::operator/(const dfloat& other) const
   {
-    /* edge case: either is nan */
+    /* edge case: either is NaN */
     if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
     {
       return dfloat(Sign::_NAN_, 0, 0);
@@ -497,7 +527,8 @@ namespace xu
 
     dfloat res;
     res.sign = (sign == other.sign) ? Sign::POS : Sign::NEG;
-    res.pow = pow - other.pow;
+    
+    int16_t new_pow = (int16_t)pow - (int16_t)other.pow;
 
     __uint128_t a = mant;
     __uint128_t b = other.mant;
@@ -506,7 +537,17 @@ namespace xu
     if (a < b)
     {
       a = a * BASE;
-      --res.pow;
+      --new_pow;
+    }
+    
+    /* overflow results in NaN */
+    if (new_pow > MAX_POW or new_pow < MIN_POW)
+    {
+      res.sign = Sign::_NAN_;
+    }
+    else
+    {
+      res.pow = new_pow;
     }
 
     /* multiply the numerator by scale before dividing */
