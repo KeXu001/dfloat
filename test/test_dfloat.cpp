@@ -23,6 +23,7 @@
  */
 
 #include <cassert>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include "dfloat.hpp"
@@ -140,6 +141,9 @@ int main()
 
   std::cout << (dfloat("78.5") <= 78.5) << std::endl;
   std::cout << (78.5 >= dfloat("78.5")) << std::endl;
+  
+  assert(dfloat() == dfloat("0"));
+  assert(dfloat(0) == dfloat("0"));
 
   assert(dfloat("10") + dfloat("20") == dfloat("30"));
   assert(dfloat("10") - dfloat("20") == dfloat("-10"));
@@ -155,4 +159,23 @@ int main()
   assert(dfloat("1000") / -dfloat("1000") == dfloat("-1"));
 
   assert((double)(dfloat("0.2") - dfloat("0.3")) == -0.1);
+  
+  std::cout << dfloat((double)dfloat("0.2")) << std::endl;
+  std::cout << dfloat((float)dfloat("0.2")) << std::endl;
+  
+  dfloat nan = dfloat(1)/dfloat(0);
+  
+  assert(false == (dfloat(NAN) == dfloat(0)));
+  assert(false == (dfloat(NAN) > dfloat(0)));
+  assert(false == (dfloat(NAN) < dfloat(0)));
+  assert(false == (dfloat(NAN) == dfloat(INFINITY)));
+  assert(false == (dfloat(NAN) == dfloat(1)));
+  assert(false == (dfloat(NAN) == dfloat(-NAN)));
+  assert(dfloat::isNaN(dfloat(1)/dfloat(0)));
+  assert(dfloat::isNaN(dfloat(0)/dfloat(0)));
+  
+  assert(dfloat::isNaN(dfloat(1)+nan));
+  assert(dfloat::isNaN(dfloat(1)-nan));
+  assert(dfloat::isNaN(dfloat(1)*nan));
+  assert(dfloat::isNaN(dfloat(1)/nan));
 }

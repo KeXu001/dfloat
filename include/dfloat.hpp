@@ -75,12 +75,12 @@ namespace xu
     }
     else if (value > 0)
     {
-      sign = Sign::POSITIVE;
+      sign = Sign::POS;
       mant = value;
     }
     else
     {
-      sign = Sign::NEGATIVE;
+      sign = Sign::NEG;
       mant = -value;
     }
 
@@ -107,7 +107,7 @@ namespace xu
     }
     else
     {
-      sign = Sign::POSITIVE;
+      sign = Sign::POS;
       mant = value;
     }    
 
@@ -142,13 +142,18 @@ namespace xu
       sign = Sign::ZERO;
       return;
     }
+    else if (!std::isfinite(value))
+    {
+      sign = Sign::_NAN_;
+      return;
+    }
     else if (value > 0)
     {
-      sign = Sign::POSITIVE;
+      sign = Sign::POS;
     }
     else
     {
-      sign = Sign::NEGATIVE;
+      sign = Sign::NEG;
       value = -value;
     }
 
@@ -193,6 +198,10 @@ namespace xu
     {
       return 0;
     }
+    else if (sign == Sign::_NAN_)
+    {
+      return NAN;
+    }
 
     T res = mant;
     res /= SCALE;
@@ -215,7 +224,7 @@ namespace xu
       ++pow_to_zero;
     }
 
-    if (sign == Sign::POSITIVE)
+    if (sign == Sign::POS)
     {
       return res;
     }
@@ -262,12 +271,6 @@ namespace xu
   }
 
   inline
-  bool dfloat::isZero() const
-  {
-    return sign == Sign::ZERO;
-  }
-
-  inline
   dfloat& dfloat::operator+=(const dfloat& other)
   {
     return operator=(operator+(other));
@@ -294,23 +297,29 @@ namespace xu
   inline
   dfloat dfloat::operator-() const
   {
-    if (sign == Sign::POSITIVE)
+    switch (sign)
     {
-      return dfloat(Sign::NEGATIVE, mant, pow);
-    }
-    else if (sign == Sign::NEGATIVE)
-    {
-      return dfloat(Sign::POSITIVE, mant, pow);
-    }
-    else
-    {
-      return dfloat();
+      case Sign::NEG:
+        return dfloat(Sign::POS, mant, pow);
+      case Sign::ZERO:
+        return dfloat(Sign::ZERO, 0, 0);
+      case Sign::POS:
+        return dfloat(Sign::NEG, mant, pow);
+      case Sign::_NAN_:
+      default:
+        return dfloat(Sign::_NAN_, 0, 0);
     }
   }
 
   inline
   dfloat dfloat::operator+(const dfloat& other) const
   {
+    /* edge case: either is nan */
+    if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
+    {
+      return dfloat(Sign::_NAN_, 0, 0);
+    }
+    
     /* edge case: lhs is zero */
     if (sign == Sign::ZERO)
     {
@@ -430,6 +439,12 @@ namespace xu
   inline
   dfloat dfloat::operator*(const dfloat& other) const
   {
+    /* edge case: either is nan */
+    if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
+    {
+      return dfloat(Sign::_NAN_, 0, 0);
+    }
+    
     /* edge case: either is zero */
     if (sign == Sign::ZERO or other.sign == Sign::ZERO)
     {
@@ -437,7 +452,7 @@ namespace xu
     }
 
     dfloat res;
-    res.sign = (sign == other.sign) ? Sign::POSITIVE : Sign::NEGATIVE;
+    res.sign = (sign == other.sign) ? Sign::POS : Sign::NEG;
     res.pow = pow + other.pow;
 
     __uint128_t a = mant;
@@ -462,20 +477,26 @@ namespace xu
   inline
   dfloat dfloat::operator/(const dfloat& other) const
   {
+    /* edge case: either is nan */
+    if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
+    {
+      return dfloat(Sign::_NAN_, 0, 0);
+    }
+    
+    /* edge case: denominator zero */
+    if (other.sign == Sign::ZERO)
+    {
+      return dfloat(Sign::_NAN_, 0, 0);
+    }
+    
     /* edge case: numerator is zero */
     if (sign == Sign::ZERO)
     {
       return dfloat();
     }
 
-    /* edge case: denominator zero */
-    if (other.sign == Sign::ZERO)
-    {
-      throw std::runtime_error("Divide by zero error");
-    }
-
     dfloat res;
-    res.sign = (sign == other.sign) ? Sign::POSITIVE : Sign::NEGATIVE;
+    res.sign = (sign == other.sign) ? Sign::POS : Sign::NEG;
     res.pow = pow - other.pow;
 
     __uint128_t a = mant;
@@ -497,29 +518,63 @@ namespace xu
   inline
   short dfloat::_comparedTo(const dfloat& other) const
   {
-    if (sign == Sign::ZERO and other.sign == Sign::ZERO)
+    /* if either is nan, there is no comparison */
+    if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
     {
-      return 0;
+      return 2;
     }
-    else if (sign == Sign::ZERO and other.sign == Sign::POSITIVE)
+    
+    switch (sign)
     {
-      return -1;
-    }
-    else if (sign == Sign::ZERO and other.sign == Sign::NEGATIVE)
-    {
-      return 1;
-    }
-    else if (sign == Sign::POSITIVE and other.sign != Sign::POSITIVE)
-    {
-      return 1;
-    }
-    else if (sign == Sign::NEGATIVE and other.sign != Sign::NEGATIVE)
-    {
-      return -1;
+      case Sign::NEG:
+      {
+        switch (other.sign)
+        {
+          case Sign::NEG:
+            break;  // sign match, need to compare magnitude
+          case Sign::ZERO:
+          case Sign::POS:
+            return -1;
+          default:
+            break;
+        }
+        break;
+      }
+      case Sign::ZERO:
+      {
+        switch (other.sign)
+        {
+          case Sign::NEG:
+            return 1;
+          case Sign::ZERO:
+            return 0;
+          case Sign::POS:
+            return -1;
+          default:
+            break;
+        }
+        break;
+      }
+      case Sign::POS:
+      {
+        switch (other.sign)
+        {
+          case Sign::NEG:
+          case Sign::ZERO:
+            return 1;
+          case Sign::POS:
+            break;  // sign match, need to compare magnitude
+          default:
+            break;
+        }
+        break;
+      }
+      default:
+        break;
     }
 
-    /* flip comparison if operands are both negative */
-    if (sign == Sign::POSITIVE)
+    /* flip comparison if operands are both NEG */
+    if (sign == Sign::POS)
     {
       return _compareMagnitudeTo(other);
     }
@@ -532,21 +587,6 @@ namespace xu
   inline
   short dfloat::_compareMagnitudeTo(const dfloat& other) const
   {
-    /* edge cases: one or more of the operands are zero */
-    if (sign == Sign::ZERO and other.sign == Sign::ZERO)
-    {
-      return 0;
-    }
-    else if (sign == Sign::ZERO)
-    {
-      return -1;
-    }
-    else if (other.sign == Sign::ZERO)
-    {
-      return 1;
-    }
-
-
     if (pow > other.pow)
     {
       return 1;
@@ -600,7 +640,7 @@ namespace xu
       {
         if (first_char)
         {
-          sign = Sign::NEGATIVE;
+          sign = Sign::NEG;
         }
         else
         {
@@ -649,12 +689,12 @@ namespace xu
 
         if (c != '0')
         {
-          /* if first nonzero digit, set to positive sign (unless already negative); then increment nonzer_digits */
+          /* if first nonzero digit, set to POS sign (unless already NEG); then increment nonzer_digits */
           if (nonzero_digits++ == 0)
           {
-            if (sign != Sign::NEGATIVE)
+            if (sign != Sign::NEG)
             {
-              sign = Sign::POSITIVE;
+              sign = Sign::POS;
             }
           }
         }
@@ -721,7 +761,7 @@ namespace xu
     std::ios_base::fmtflags orig_stream_flags(stream.flags());
     stream << std::resetiosflags(orig_stream_flags);
 
-    if (sign == Sign::NEGATIVE)
+    if (sign == Sign::NEG)
     {
       stream << '-';
     }
@@ -807,6 +847,12 @@ namespace xu
     stream.flags(orig_stream_flags);
 
     return stream;
+  }
+  
+  inline
+  bool dfloat::isNaN(const dfloat& d)
+  {
+    return d.sign == Sign::_NAN_;
   }
 
   template <typename T>

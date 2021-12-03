@@ -24,8 +24,10 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 #include <iomanip>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -76,13 +78,16 @@ namespace xu
     static const int8_t MIN_POW = -128;
 
     /**
-      @brief  Represents sign of the mantissa
+      @brief  Represents sign of the mantissa, if there is one, or NaN
+      @note   Unlike doubles, dfloats cannot be infinity or -infinity or -nan
       */
     enum class Sign : int8_t
     {
-      NEGATIVE = -1,
+      NEG = -1,
       ZERO = 0,
-      POSITIVE = 1
+      POS = 1,
+      
+      _NAN_ = 2
     };
 
     /**
@@ -111,11 +116,14 @@ namespace xu
 
     dfloat(const dfloat& other);
 
+  protected:
     /**
       @brief  Verbose constructor
               Construct dfloat from parts
       */
     dfloat(Sign sign_, uint64_t mant_, int8_t pow_);
+  
+  public:
 
     //  ===========
     //  Conversions
@@ -161,8 +169,6 @@ namespace xu
     bool operator>=(const dfloat& other) const;
 
     bool operator<=(const dfloat& other) const;
-
-    bool isZero() const;
 
     //  ====================
     //  Assignment Operators
@@ -216,13 +222,14 @@ namespace xu
   protected:
     /**
       @brief  Returns which operand is greater
-      @return 1 if greater than other, -1 if less than other, 0 if equal
+      @return 1 if greater than other, -1 if less than other, 0 if equal, 2 if no comparison
       */
     short _comparedTo(const dfloat& other) const;
 
     /**
       @brief  Returns which operand has larger magnitude
-      @return 1 if bigger than other, -1 if smaller than other, 0 if equal
+      @note   Assumes both numbers are valid and finite
+      @return 1 if bigger than other, -1 if smaller than other, 0 if equal, 2 if no comparison
       */
     short _compareMagnitudeTo(const dfloat& other) const;
 
@@ -279,6 +286,13 @@ namespace xu
       @note   Output is always in decimal notation (never scientific notation)
       */
     std::ostream& print(std::ostream& stream) const;
+    
+    //  ==============
+    //  Static Methods
+    //  ==============
+    
+    static bool isNaN(const dfloat& d);
+    
   } __attribute__((packed));
 
   /**
