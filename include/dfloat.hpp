@@ -618,7 +618,8 @@ namespace xu
     /* edge case: str is empty */
     if (str.length() < 1)
     {
-      throw parse_error("dfloat parse error: empty string");
+      sign = Sign::_NAN_;
+      return;
     }
 
     sign = Sign::ZERO;
@@ -644,7 +645,8 @@ namespace xu
         }
         else
         {
-          throw parse_error(c);
+          sign = Sign::_NAN_;
+          return;
         }
       }
       else if (c >= '0' and c <= '9')
@@ -667,8 +669,8 @@ namespace xu
           {
             if (pow++ >= MAX_POW)
             {
-              /* if increasing power will lead to overflow, throw exception */
-              throw parse_error("dfloat parse error: exceeded max power");
+              sign = Sign::_NAN_;
+              return;
             }
           }
         }
@@ -682,7 +684,8 @@ namespace xu
           {
             if (pow-- <= MIN_POW)
             {
-              throw parse_error("dfloat parse error: exceeded min power");
+              sign = Sign::_NAN_;
+              return;
             }
           }
         }
@@ -707,12 +710,14 @@ namespace xu
         }
         else
         {
-          throw parse_error(c);
+          sign = Sign::_NAN_;
+          return;
         }
       }
       else
       {
-        throw parse_error(c);
+        sign = Sign::_NAN_;
+        return;
       }
 
 
@@ -732,7 +737,8 @@ namespace xu
       mant *= BASE;
       if (pow-- <= MIN_POW)
       {
-        throw parse_error("dfloat parse error: exceeded min power");
+        sign = Sign::_NAN_;
+        return;
       }
     }
   }

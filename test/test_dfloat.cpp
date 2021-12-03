@@ -35,6 +35,8 @@ typedef xu::dfloat dfloat;
 
 int main()
 {
+  // g++ -o bin/test_dfloat -I../include -Wfatal-errors -Wall test_dfloat.cpp other_class.cpp
+  
   std::cout << "sizeof(dfloat)=" << sizeof(dfloat) << std::endl;
 
   // dfloat df1(1152921504606846976ul);
@@ -178,4 +180,9 @@ int main()
   assert(dfloat::isNaN(dfloat(1)-nan));
   assert(dfloat::isNaN(dfloat(1)*nan));
   assert(dfloat::isNaN(dfloat(1)/nan));
+  
+  assert(dfloat::isNaN(dfloat("bogus")));
+  assert(dfloat::isNaN(dfloat("--1")));
+  assert(dfloat::isNaN(dfloat("1e10")));
+  assert(dfloat::isNaN(dfloat("+5")));
 }

@@ -90,23 +90,6 @@ namespace xu
       _NAN_ = 2
     };
 
-    /**
-      @brief  Error type when parsing string as dfloat
-      */
-    class parse_error : public std::runtime_error
-    {
-    protected:
-      char err_c;
-    public:
-      explicit parse_error(const std::string& what_arg)
-        : std::runtime_error(what_arg)
-      {}
-
-      explicit parse_error(char c)
-        : std::runtime_error(std::string("dfloat parse error: at char \'") + c + '\'')
-      {}
-    };
-
   public:
     /**
       @brief  Default constructor
@@ -271,8 +254,7 @@ namespace xu
               String must be in decimal notation (not scientific notation) and contain NO commas
               String must consist of only digits [and a negative sign] [and a decimal point]
       @note   Leading zeros are ignored.
-      @throw  xu::dfloat::parse_error
-              If format is not understood
+      @note   If bad format, results in NaN
       */
     dfloat(const std::string& str);
 
