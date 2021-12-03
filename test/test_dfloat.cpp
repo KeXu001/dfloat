@@ -167,6 +167,12 @@ int main()
   
   dfloat nan = dfloat(1)/dfloat(0);
   
+  assert(!dfloat::isNaN(dfloat(0)));
+  assert(dfloat::isNaN(dfloat(NAN)));
+  assert(dfloat::isNaN(dfloat(-NAN)));
+  assert(dfloat::isNaN(dfloat(INFINITY)));
+  assert(dfloat::isNaN(dfloat(-INFINITY)));
+  
   assert(false == (dfloat(NAN) == dfloat(0)));
   assert(false == (dfloat(NAN) > dfloat(0)));
   assert(false == (dfloat(NAN) < dfloat(0)));
