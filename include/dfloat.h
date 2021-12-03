@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 #include <iomanip>
 #include <ostream>
@@ -135,11 +136,12 @@ namespace xu
 
     /* since on some systems, uint64_t may be defined as `unsigned long` instead of `unsigned long long`, have another overload */
     dfloat(unsigned long long value);
-
-    dfloat(double value);
-
-    dfloat(float value);
-
+    
+    template <
+      typename T,
+      typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+    dfloat(T value);
+    
     explicit operator double() const;
 
     //  ====================

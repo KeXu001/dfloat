@@ -73,8 +73,7 @@ namespace xu
       sign = Sign::ZERO;
       return;
     }
-
-    if (value > 0)
+    else if (value > 0)
     {
       sign = Sign::POSITIVE;
       mant = value;
@@ -132,66 +131,18 @@ namespace xu
 
   }
 
+  template <
+    typename T,
+    typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
   inline
-  dfloat::dfloat(double value)
+  dfloat::dfloat(T value)
   {
     if (value == 0)
     {
       sign = Sign::ZERO;
       return;
     }
-
-    if (value > 0)
-    {
-      sign = Sign::POSITIVE;
-    }
-    else
-    {
-      sign = Sign::NEGATIVE;
-      value = -value;
-    }
-
-    /* scale value until it's between 1 and 10 */
-    pow = 0;
-    while (value < 1)
-    {
-      value *= BASE;
-      --pow;
-    }
-    while (value >= BASE)
-    {
-      value /= BASE;
-      ++pow;
-    }
-
-    mant = (uint64_t)(value * SCALE);
-
-    /*
-      I think there may be rounding errors when converting value to mant
-      Let's do a final check in case
-      */
-    while (mant < SCALE)
-    {
-      mant *= BASE;
-      --pow;
-    }
-    while (mant >= MANT_CAP)
-    {
-      mant /= BASE;
-      ++pow;
-    }
-  }
-
-  inline
-  dfloat::dfloat(float value)
-  {
-    if (value == 0)
-    {
-      sign = Sign::ZERO;
-      return;
-    }
-
-    if (value > 0)
+    else if (value > 0)
     {
       sign = Sign::POSITIVE;
     }
