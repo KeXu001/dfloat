@@ -181,6 +181,11 @@ int main()
   assert(dfloat::isNaN(dfloat(1)*nan));
   assert(dfloat::isNaN(dfloat(1)/nan));
   
+  assert(dfloat::isNaN(nan+dfloat(1)));
+  assert(dfloat::isNaN(nan-dfloat(1)));
+  assert(dfloat::isNaN(nan*dfloat(1)));
+  assert(dfloat::isNaN(nan/dfloat(1)));
+  
   assert(dfloat::isNaN(dfloat("bogus")));
   assert(dfloat::isNaN(dfloat("--1")));
   assert(dfloat::isNaN(dfloat("1e10")));
