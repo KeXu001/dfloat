@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <cstdint>
 #include <iomanip>
 #include <ostream>
@@ -142,7 +141,10 @@ namespace xu
       typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
     dfloat(T value);
     
-    explicit operator double() const;
+    template <
+      typename T,
+      typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+    explicit operator T() const;
 
     //  ====================
     //  Comparison Operators

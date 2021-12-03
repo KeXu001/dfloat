@@ -183,15 +183,18 @@ namespace xu
     }
   }
 
+  template <
+    typename T,
+    typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
   inline
-  dfloat::operator double() const
+  dfloat::operator T() const
   {
     if (sign == Sign::ZERO)
     {
       return 0;
     }
 
-    double res = mant;
+    T res = mant;
     res /= SCALE;
 
     /*
