@@ -144,6 +144,18 @@ int main()
   std::cout << (dfloat("78.5") <= 78.5) << std::endl;
   std::cout << (78.5 >= dfloat("78.5")) << std::endl;
   
+  dfloat orig("16");
+  dfloat copy1(orig);
+  dfloat copy2 = orig;
+  dfloat copy3(std::move(orig));
+  dfloat copy4 = std::move(copy3);
+  
+  std::cout << orig << std::endl;
+  std::cout << copy1 << std::endl;
+  std::cout << copy2 << std::endl;
+  std::cout << copy3 << std::endl;
+  std::cout << copy4 << std::endl;
+  
   assert(dfloat() == dfloat("0"));
   assert(dfloat(0) == dfloat("0"));
 
