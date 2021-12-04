@@ -167,11 +167,11 @@ int main()
   dfloat nan = dfloat(1)/dfloat(0);
   std::cout << nan << std::endl;
   
-  assert(!dfloat::isNaN(dfloat(0)));
-  assert(dfloat::isNaN(dfloat(NAN)));
-  assert(dfloat::isNaN(dfloat(-NAN)));
-  assert(dfloat::isNaN(dfloat(INFINITY)));
-  assert(dfloat::isNaN(dfloat(-INFINITY)));
+  assert(dfloat::isfinite(dfloat(0)));
+  assert(!dfloat::isfinite(dfloat(NAN)));
+  assert(!dfloat::isfinite(dfloat(-NAN)));
+  assert(!dfloat::isfinite(dfloat(INFINITY)));
+  assert(!dfloat::isfinite(dfloat(-INFINITY)));
   
   assert(false == (dfloat(NAN) == dfloat(0)));
   assert(false == (dfloat(NAN) > dfloat(0)));
@@ -179,46 +179,46 @@ int main()
   assert(false == (dfloat(NAN) == dfloat(INFINITY)));
   assert(false == (dfloat(NAN) == dfloat(1)));
   assert(false == (dfloat(NAN) == dfloat(-NAN)));
-  assert(dfloat::isNaN(dfloat(1)/dfloat(0)));
-  assert(dfloat::isNaN(dfloat(0)/dfloat(0)));
+  assert(!dfloat::isfinite(dfloat(1)/dfloat(0)));
+  assert(!dfloat::isfinite(dfloat(0)/dfloat(0)));
   
-  assert(dfloat::isNaN(dfloat(1)+nan));
-  assert(dfloat::isNaN(dfloat(1)-nan));
-  assert(dfloat::isNaN(dfloat(1)*nan));
-  assert(dfloat::isNaN(dfloat(1)/nan));
+  assert(!dfloat::isfinite(dfloat(1)+nan));
+  assert(!dfloat::isfinite(dfloat(1)-nan));
+  assert(!dfloat::isfinite(dfloat(1)*nan));
+  assert(!dfloat::isfinite(dfloat(1)/nan));
   
-  assert(dfloat::isNaN(nan+dfloat(1)));
-  assert(dfloat::isNaN(nan-dfloat(1)));
-  assert(dfloat::isNaN(nan*dfloat(1)));
-  assert(dfloat::isNaN(nan/dfloat(1)));
+  assert(!dfloat::isfinite(nan+dfloat(1)));
+  assert(!dfloat::isfinite(nan-dfloat(1)));
+  assert(!dfloat::isfinite(nan*dfloat(1)));
+  assert(!dfloat::isfinite(nan/dfloat(1)));
   
-  assert(dfloat::isNaN(dfloat("bogus")));
-  assert(dfloat::isNaN(dfloat("--1")));
-  assert(dfloat::isNaN(dfloat("1e10")));
-  assert(dfloat::isNaN(dfloat("+5")));
+  assert(!dfloat::isfinite(dfloat("bogus")));
+  assert(!dfloat::isfinite(dfloat("--1")));
+  assert(!dfloat::isfinite(dfloat("1e10")));
+  assert(!dfloat::isfinite(dfloat("+5")));
   
-  assert(!dfloat::isNaN(dfloat(1e127) + dfloat(89999999e127)));
-  assert(!dfloat::isNaN(dfloat(1e127) + dfloat(89999999e127)));
-  assert(dfloat::isNaN(dfloat(1e127) + dfloat(9e127)));
+  assert(dfloat::isfinite(dfloat(1e127) + dfloat(89999999e127)));
+  assert(dfloat::isfinite(dfloat(1e127) + dfloat(89999999e127)));
+  assert(!dfloat::isfinite(dfloat(1e127) + dfloat(9e127)));
   
-  assert(dfloat::isNaN(dfloat(1.2e-128) - dfloat(1e-128)));
-  assert(!dfloat::isNaN(dfloat(1.2e-128) - dfloat(1.2e-128)));
-  // assert(!dfloat::isNaN(dfloat(2.2e-128) - dfloat(1.2e-128)));  // TODO: this doesn't work because 2.2e-128 ends up being 2.19999...
+  assert(!dfloat::isfinite(dfloat(1.2e-128) - dfloat(1e-128)));
+  assert(dfloat::isfinite(dfloat(1.2e-128) - dfloat(1.2e-128)));
+  // assert(dfloat::isfinite(dfloat(2.2e-128) - dfloat(1.2e-128)));  // TODO: this doesn't work because 2.2e-128 ends up being 2.19999...
   
-  assert(dfloat::isNaN(dfloat(1e-128) / dfloat(2)));
-  assert(!dfloat::isNaN(dfloat(1e-128) / dfloat(1)));
+  assert(!dfloat::isfinite(dfloat(1e-128) / dfloat(2)));
+  assert(dfloat::isfinite(dfloat(1e-128) / dfloat(1)));
   
-  assert(!dfloat::isNaN(dfloat(1e100)*dfloat(1e27)));
-  assert(!dfloat::isNaN(dfloat(1e-100)*dfloat(1e-28)));
+  assert(dfloat::isfinite(dfloat(1e100)*dfloat(1e27)));
+  assert(dfloat::isfinite(dfloat(1e-100)*dfloat(1e-28)));
   
-  assert(dfloat::isNaN(dfloat(1e100)*dfloat(1e28)));
-  assert(dfloat::isNaN(dfloat(1e-100)*dfloat(1e-29)));
+  assert(!dfloat::isfinite(dfloat(1e100)*dfloat(1e28)));
+  assert(!dfloat::isfinite(dfloat(1e-100)*dfloat(1e-29)));
   
-  assert(dfloat::isNaN(dfloat(1e100)/dfloat(1e-28)));
-  assert(dfloat::isNaN(dfloat(1e-100)/dfloat(1e29)));
+  assert(!dfloat::isfinite(dfloat(1e100)/dfloat(1e-28)));
+  assert(!dfloat::isfinite(dfloat(1e-100)/dfloat(1e29)));
   
-  assert(dfloat::isNaN(dfloat(5e100)*dfloat(2e27)));
-  assert(!dfloat::isNaN(dfloat(5e-100)*dfloat(2e-29)));
+  assert(!dfloat::isfinite(dfloat(5e100)*dfloat(2e27)));
+  assert(dfloat::isfinite(dfloat(5e-100)*dfloat(2e-29)));
   
   dfloat orig("16");
   dfloat copy1(orig);

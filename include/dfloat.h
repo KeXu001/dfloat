@@ -278,7 +278,7 @@ namespace xu
     //  Static Methods
     //  ==============
     
-    static bool isNaN(const dfloat& d);
+    static bool isfinite(const dfloat& d);
     
   } __attribute__((packed));
 

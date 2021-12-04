@@ -886,9 +886,9 @@ namespace xu
   }
   
   inline
-  bool dfloat::isNaN(const dfloat& d)
+  bool dfloat::isfinite(const dfloat& d)
   {
-    return d.sign == Sign::_NAN_;
+    return d.sign != Sign::_NAN_;
   }
 
   template <typename T>
