@@ -144,19 +144,6 @@ int main()
   std::cout << (dfloat("78.5") <= 78.5) << std::endl;
   std::cout << (78.5 >= dfloat("78.5")) << std::endl;
   
-  dfloat orig("16");
-  dfloat copy1(orig);
-  dfloat copy2 = orig;
-  dfloat copy3(std::move(orig));
-  dfloat copy4 = std::move(copy3);
-  
-  std::cout << orig << std::endl;
-  std::cout << copy1 << std::endl;
-  std::cout << copy2 << std::endl;
-  std::cout << copy3 << std::endl;
-  std::cout << copy4 << std::endl;
-  
-  assert(dfloat() == dfloat("0"));
   assert(dfloat(0) == dfloat("0"));
 
   assert(dfloat("10") + dfloat("20") == dfloat("30"));
@@ -232,4 +219,19 @@ int main()
   
   assert(dfloat::isNaN(dfloat(5e100)*dfloat(2e27)));
   assert(!dfloat::isNaN(dfloat(5e-100)*dfloat(2e-29)));
+  
+  dfloat orig("16");
+  dfloat copy1(orig);
+  dfloat copy2 = orig;
+  
+  assert(copy1 == orig);
+  assert(copy2 == orig);
+  
+  dfloat copy3(std::move(orig));
+  
+  assert(copy3 == dfloat("16"));
+  
+  dfloat copy4 = std::move(copy3);
+  
+  assert(copy4 == dfloat("16"));
 }

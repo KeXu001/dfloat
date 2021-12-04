@@ -29,24 +29,6 @@
 namespace xu
 {
   inline
-  dfloat::dfloat()
-    : sign(Sign::ZERO),
-      mant(0),
-      pow(0)
-  {
-
-  }
-
-  inline
-  dfloat::dfloat(const dfloat& other)
-    : sign(other.sign),
-      mant(other.mant),
-      pow(other.pow)
-  {
-
-  }
-
-  inline
   dfloat::dfloat(Sign sign_, uint64_t mant_, int8_t pow_)
     : sign(sign_),
       mant(mant_),
@@ -381,7 +363,7 @@ namespace xu
     /* different sign: subtract smaller magnitude from larger magnitude and use larger magnitude's sign */
     else
     {
-      dfloat res;
+      dfloat res(Sign::ZERO, 0, 0);
 
       short compare = _compareMagnitudeTo(other);
 
@@ -467,7 +449,7 @@ namespace xu
     /* edge case: either is zero */
     if (sign == Sign::ZERO or other.sign == Sign::ZERO)
     {
-      return dfloat();
+      return dfloat(Sign::ZERO, 0, 0);
     }
     
     dfloat res;
@@ -522,7 +504,7 @@ namespace xu
     /* edge case: numerator is zero */
     if (sign == Sign::ZERO)
     {
-      return dfloat();
+      return dfloat(Sign::ZERO, 0, 0);
     }
 
     dfloat res;

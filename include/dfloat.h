@@ -92,11 +92,17 @@ namespace xu
   public:
     /**
       @brief  Default constructor
-              Construct zero-initialized dfloat
+              Construct uninitialized dfloat
       */
-    dfloat();
+    dfloat() = default;
 
-    dfloat(const dfloat& other);
+    dfloat(const dfloat& other) = default;
+    
+    dfloat& operator=(const dfloat& other) = default;
+    
+    dfloat(dfloat&& other) = default;
+    
+    dfloat& operator=(dfloat&& other) = default;
 
   protected:
     /**
