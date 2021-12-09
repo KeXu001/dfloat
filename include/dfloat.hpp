@@ -39,16 +39,41 @@ namespace xu
 
   template <
     typename T,
-    typename std::enable_if_t<std::is_integral<T>::value, bool> = true>
+    typename std::enable_if_t<
+      std::is_integral<T>::value && std::is_unsigned<T>::value,
+      bool> = true>
   inline
   dfloat::dfloat(T value)
-    : dfloat((int64_t)value)
   {
-    
+    if (value == 0)
+    {
+      sign = Sign::ZERO;
+      return;
+    }
+
+    sign = Sign::POS;
+    mant = value;    
+
+    pow = SCALE_POW;
+    while (mant < SCALE)
+    {
+      mant *= BASE;
+      --pow;
+    }
+    while (mant >= MANT_CAP)
+    {
+      mant /= BASE;
+      ++pow;
+    }
   }
 
+  template <
+    typename T,
+    typename std::enable_if_t<
+      std::is_integral<T>::value && std::is_signed<T>::value,
+      bool> = true>
   inline
-  dfloat::dfloat(int64_t value)
+  dfloat::dfloat(T value)
   {
     if (value == 0)
     {
@@ -77,40 +102,6 @@ namespace xu
       mant /= BASE;
       ++pow;
     }
-  }
-
-  inline
-  dfloat::dfloat(uint64_t value)
-  {
-    if (value == 0)
-    {
-      sign = Sign::ZERO;
-      return;
-    }
-    else
-    {
-      sign = Sign::POS;
-      mant = value;
-    }    
-
-    pow = SCALE_POW;
-    while (mant < SCALE)
-    {
-      mant *= BASE;
-      --pow;
-    }
-    while (mant >= MANT_CAP)
-    {
-      mant /= BASE;
-      ++pow;
-    }
-  }
-
-  inline
-  dfloat::dfloat(unsigned long long value)
-    : dfloat((uint64_t)value)
-  {
-
   }
 
   template <
@@ -635,9 +626,452 @@ namespace xu
     }
   }
 
+  /*
+    State machine
+
+      descr {action}                next char --> next state
+    state                           +       -       0       1-9     eE      .       end     other
+    ------------------------------------------------------------------------------------------------
+    begin                           sign    sign    leadz   whole   fail    frac    fail    fail
+      initial state
+    sign                            fail    fail    leadz   whole   fail    frac    fail    fail
+      just parsed a sign
+    leadz                           fail    fail    leadz   whole   ze1     frac    zero    fail
+      zeros in front of decimal
+    ze1                             zes     zes     ze2     ze2     fail    fail    fail    fail
+      parsed an e/E after zero,
+      expecting sign or digits
+    zes                             fail    fail    ze2     ze2     fail    fail    fail    fail
+      parsed a sign after e/E
+      after zero, expecting digits
+    ze2                             fail    fail    ze2     ze2     fail    fail    zero    fail
+      parsed digits after e/E
+      after zero, expecting digits
+    whole                           fail    fail    whole   whole   e1      frac    done    fail
+      already saw first digit, in
+      integral part
+    frac                            fail    fail    frac    frac    e1      fail    done    fail
+      already saw decimal point,
+      expecting digits or exp
+    e1                              es      es      e2      e2      fail    fail    fail    fail
+      parsed an e/E, expecting
+      sign or digits
+    es                              fail    fail    e2      e2      fail    fail    fail    fail
+      parsed a sign after e/E,
+      expecting digits
+    e2                              fail    fail    e2      e2      fail    fail    done    fail
+      parsed digits after e/E,
+      expecting digits
+
+    zero
+      {return 0}
+    fail
+      {return nan}
+    done
+      {return number}
+
+  */
+
+
   inline
   dfloat dfloat::parse(const std::string& str)
   {
+//     Sign sign;
+
+//     auto it = str.begin();
+
+// dfloat_parse_begin:
+//     if (it == str.end())
+//     {
+//       goto dfloat_parse_fail;
+//     }
+
+//     switch (*it)
+//     {
+//       case '+':
+//       {
+//         goto dfloat_parse_sign;
+//       }
+//       case '-':
+//       {
+//         goto dfloat_parse_sign;
+//       }
+//       case '0':
+//       {
+//         goto dfloat_parse_leadz;
+//       }
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_whole;
+//       }
+//       case '.':
+//       {
+//         goto dfloat_parse_frac;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_sign:
+//     if (*it == '+')
+//     {
+//       sign = Sign::POS;
+//     }
+//     else
+//     {
+//       sign = Sign::NEG;
+//     }
+
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_fail;
+//     }
+
+//     switch (*it)
+//     {
+//       case '0':
+//       {
+//         goto dfloat_parse_leadz;
+//       }
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_whole;
+//       }
+//       case '.':
+//       {
+//         goto dfloat_parse_frac;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_leadz:
+//     // no action: ignore leading zeroes
+
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_zero;
+//     }
+
+//     switch (*it)
+//     {
+//       case '0':
+//       {
+//         goto dfloat_parse_leadz;
+//       }
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_whole;
+//       }
+//       case 'e':
+//       case 'E':
+//       {
+//         goto dfloat_parse_ze1;
+//       }
+//       case '.':
+//       {
+//         goto dfloat_parse_frac;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_ze1:
+//     // no action: prepare to parse exponent
+
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_fail;
+//     }
+
+//     switch (*it)
+//     {
+//       case '+':
+//       case '-':
+//       {
+//         goto dfloat_parse_zes;
+//       }
+//       case '0':
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_ze2;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_zes:
+//     // no action: doesn't matter what sign exponent is after zero
+
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_fail;
+//     }
+
+//     switch (*it)
+//     {
+//       case '0':
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_ze2;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_ze2:
+//     // no action: doesn't matter what exponent is after zero
+    
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_zero;
+//     }
+
+//     switch (*it)
+//     {
+//       case '0':
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_ze2;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_whole:
+//     // todo: modify mant
+    
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_done;
+//     }
+
+//     switch (*it)
+//     {
+//       case '0':
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_whole;
+//       }
+//       case 'e':
+//       case 'E':
+//       {
+//         goto dfloat_parse_e1;
+//       }
+//       case '.':
+//       {
+//         goto dfloat_parse_frac;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_frac:
+//     // todo: modify mant and pow
+
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_done;
+//     }
+
+//     switch (*it)
+//     {
+//       case '0':
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_frac;
+//       }
+//       case 'e':
+//       case 'E':
+//       {
+//         goto dfloat_parse_e1;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_e1:
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_fail;
+//     }
+
+//     switch (*it)
+//     {
+//       case '+':
+//       case '-':
+//       {
+//         goto dfloat_parse_es;
+//       }
+//       case '0':
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_e2;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_es:
+//     // todo: set exponent sign
+
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_fail;
+//     }
+
+//     switch (*it)
+//     {
+//       case '0':
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_e2;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_e2:
+//     // todo update exponent
+
+//     if (++it == str.end())
+//     {
+//       goto dfloat_parse_done;
+//     }
+
+//     switch (*it)
+//     {
+//       case '0':
+//       case '1':
+//       case '2':
+//       case '3':
+//       case '4':
+//       case '5':
+//       case '6':
+//       case '7':
+//       case '8':
+//       case '9':
+//       {
+//         goto dfloat_parse_e2;
+//       }
+//       default:
+//       {
+//         goto dfloat_parse_fail;
+//       }
+//     }
+
+// dfloat_parse_zero:
+//     return dfloat(Sign::ZERO, 0, 0);
+
+// dfloat_parse_fail:
+//     return dfloat(Sign::_NAN_, 0, 0);
+
+// dfloat_parse_done:
+    // todo formalify mant and pow
+
+
+
+
     dfloat res;
 
     /* edge case: str is empty */

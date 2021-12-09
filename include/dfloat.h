@@ -121,21 +121,22 @@ namespace xu
     //  Conversions
     //  ===========
 
-    /* must fit into a long long */
+    /* constructor for unsigned integers */
     template <
       typename T,
-      typename std::enable_if_t<std::is_integral<T>::value, bool> = true>
+      typename std::enable_if_t<
+        std::is_integral<T>::value && std::is_unsigned<T>::value,
+        bool> = true>
     dfloat(T value);
 
-    /* default logic for integral types */
-    dfloat(int64_t value);
+    /* constructor for signed integers */
+    template <
+      typename T,
+      typename std::enable_if_t<
+        std::is_integral<T>::value && std::is_signed<T>::value,
+        bool> = true>
+    dfloat(T value);
 
-    /* uint64_t won't fit into int64_t, so have a special overload */
-    dfloat(uint64_t value);
-
-    /* since on some systems, uint64_t may be defined as `unsigned long` instead of `unsigned long long`, have another overload */
-    dfloat(unsigned long long value);
-    
     template <
       typename T,
       typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
