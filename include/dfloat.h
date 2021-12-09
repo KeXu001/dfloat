@@ -61,8 +61,10 @@ namespace xu
 
     /**
       @brief  Constant to hold base 10
+      @note   Implementation note: we use uint8_t instead of mant_t, otherwise
+              some necessary operations will not have integer promotion
       */
-    static const mant_t BASE = 10;
+    static const uint8_t BASE = 10;
 
     /**
       @brief  The maximum value of `mant`, plus one
@@ -261,10 +263,15 @@ namespace xu
 
     /**
       @brief  Parse string as dfloat
-              String must be in decimal notation (not scientific notation) and contain NO commas
-              String must consist of only digits [and a negative sign] [and a decimal point]
+              String must be in decimal or scientific notation.
       @note   Leading zeros are ignored.
-      @note   If bad format, results in NaN
+      @note   Sign (+/-) is supported before the integral part as well as the
+              exponent.
+      @note   If bad format, result is NaN.
+      @note   If outside range, result is NaN.
+      @note   If whole number part exceeds range, or if exponent exceeds
+              exponent range, result will be NaN, even if the exponent would
+              bring it back within range e.g. "10...0e-200" would fail
       */
     static dfloat parse(const std::string& str);
 

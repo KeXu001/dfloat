@@ -189,8 +189,8 @@ int main()
   
   assert(!dfloat::isfinite(dfloat::parse("bogus")));
   assert(!dfloat::isfinite(dfloat::parse("--1")));
-  assert(!dfloat::isfinite(dfloat::parse("1e10")));
-  assert(!dfloat::isfinite(dfloat::parse("+5")));
+  assert(dfloat::isfinite(dfloat::parse("1e10")));
+  assert(dfloat::isfinite(dfloat::parse("+5")));
   
   assert(dfloat::isfinite(dfloat(1e127) + dfloat(89999999e127)));
   assert(dfloat::isfinite(dfloat(1e127) + dfloat(89999999e127)));

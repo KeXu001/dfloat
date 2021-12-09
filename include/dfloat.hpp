@@ -676,532 +676,544 @@ namespace xu
   inline
   dfloat dfloat::parse(const std::string& str)
   {
-//     Sign sign;
+    Sign sign = Sign::POS;
+    mant_t mant = 0;
+    pow_t pow = SCALE_POW;
 
-//     auto it = str.begin();
+    sign_t exp_sign = 1;
 
-// dfloat_parse_begin:
-//     if (it == str.end())
-//     {
-//       goto dfloat_parse_fail;
-//     }
+    auto it = str.begin();
 
-//     switch (*it)
-//     {
-//       case '+':
-//       {
-//         goto dfloat_parse_sign;
-//       }
-//       case '-':
-//       {
-//         goto dfloat_parse_sign;
-//       }
-//       case '0':
-//       {
-//         goto dfloat_parse_leadz;
-//       }
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_whole;
-//       }
-//       case '.':
-//       {
-//         goto dfloat_parse_frac;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_sign:
-//     if (*it == '+')
-//     {
-//       sign = Sign::POS;
-//     }
-//     else
-//     {
-//       sign = Sign::NEG;
-//     }
-
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_fail;
-//     }
-
-//     switch (*it)
-//     {
-//       case '0':
-//       {
-//         goto dfloat_parse_leadz;
-//       }
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_whole;
-//       }
-//       case '.':
-//       {
-//         goto dfloat_parse_frac;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_leadz:
-//     // no action: ignore leading zeroes
-
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_zero;
-//     }
-
-//     switch (*it)
-//     {
-//       case '0':
-//       {
-//         goto dfloat_parse_leadz;
-//       }
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_whole;
-//       }
-//       case 'e':
-//       case 'E':
-//       {
-//         goto dfloat_parse_ze1;
-//       }
-//       case '.':
-//       {
-//         goto dfloat_parse_frac;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_ze1:
-//     // no action: prepare to parse exponent
-
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_fail;
-//     }
-
-//     switch (*it)
-//     {
-//       case '+':
-//       case '-':
-//       {
-//         goto dfloat_parse_zes;
-//       }
-//       case '0':
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_ze2;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_zes:
-//     // no action: doesn't matter what sign exponent is after zero
-
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_fail;
-//     }
-
-//     switch (*it)
-//     {
-//       case '0':
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_ze2;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_ze2:
-//     // no action: doesn't matter what exponent is after zero
-    
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_zero;
-//     }
-
-//     switch (*it)
-//     {
-//       case '0':
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_ze2;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_whole:
-//     // todo: modify mant
-    
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_done;
-//     }
-
-//     switch (*it)
-//     {
-//       case '0':
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_whole;
-//       }
-//       case 'e':
-//       case 'E':
-//       {
-//         goto dfloat_parse_e1;
-//       }
-//       case '.':
-//       {
-//         goto dfloat_parse_frac;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_frac:
-//     // todo: modify mant and pow
-
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_done;
-//     }
-
-//     switch (*it)
-//     {
-//       case '0':
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_frac;
-//       }
-//       case 'e':
-//       case 'E':
-//       {
-//         goto dfloat_parse_e1;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_e1:
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_fail;
-//     }
-
-//     switch (*it)
-//     {
-//       case '+':
-//       case '-':
-//       {
-//         goto dfloat_parse_es;
-//       }
-//       case '0':
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_e2;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_es:
-//     // todo: set exponent sign
-
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_fail;
-//     }
-
-//     switch (*it)
-//     {
-//       case '0':
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_e2;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_e2:
-//     // todo update exponent
-
-//     if (++it == str.end())
-//     {
-//       goto dfloat_parse_done;
-//     }
-
-//     switch (*it)
-//     {
-//       case '0':
-//       case '1':
-//       case '2':
-//       case '3':
-//       case '4':
-//       case '5':
-//       case '6':
-//       case '7':
-//       case '8':
-//       case '9':
-//       {
-//         goto dfloat_parse_e2;
-//       }
-//       default:
-//       {
-//         goto dfloat_parse_fail;
-//       }
-//     }
-
-// dfloat_parse_zero:
-//     return dfloat(Sign::ZERO, 0, 0);
-
-// dfloat_parse_fail:
-//     return dfloat(Sign::_NAN_, 0, 0);
-
-// dfloat_parse_done:
-    // todo formalify mant and pow
-
-
-
-
-    dfloat res;
-
-    /* edge case: str is empty */
-    if (str.length() < 1)
+    if (it == str.end())
     {
-      res.sign = Sign::_NAN_;
-      return res;
+      goto dfloat_parse_fail;
     }
 
-    res.sign = Sign::ZERO;
-    res.mant = 0;
-    res.pow = SCALE_POW;
-
-    /* whether the string contains a decimal point */
-    bool decimal_point = false;
-
-    /* only true for the very first character */
-    bool first_char = true;
-
-    /* number of nonzero digits read so far */
-    size_t nonzero_digits = 0;
-
-    for (const char& c : str)
+    switch (*it)
     {
-      if (c == '-')
+      case '+':
       {
-        if (first_char)
-        {
-          res.sign = Sign::NEG;
-        }
-        else
-        {
-          res.sign = Sign::_NAN_;
-          return res;
-        }
+        goto dfloat_parse_sign;
       }
-      else if (c >= '0' and c <= '9')
+      case '-':
       {
-        if (c == '0')
-        {
-          /* ignore leading zeros */
-          if (nonzero_digits == 0 and !decimal_point)
-          { 
-            /* need to set first_char if we are going to continue */
-            first_char = false;
-            continue;
-          }
-        }
-
-        /* if mant already holds max digits, do not add any more, just increase power if above decimal point */
-        if (res.mant >= SCALE)
-        {
-          if (!decimal_point)
-          {
-            if (res.pow++ >= MAX_POW)
-            {
-              res.sign = Sign::_NAN_;
-              return res;
-            }
-          }
-        }
-        /* otherwise, append digit to mant */
-        else
-        {
-          res.mant = res.mant * 10 + (c - '0');
-
-          /* if we are below decimal, we need to decrease power to compensate for appending to mant */
-          if (decimal_point)
-          {
-            if (res.pow-- <= MIN_POW)
-            {
-              res.sign = Sign::_NAN_;
-              return res;
-            }
-          }
-        }
-
-        if (c != '0')
-        {
-          /* if first nonzero digit, set to POS sign (unless already NEG); then increment nonzer_digits */
-          if (nonzero_digits++ == 0)
-          {
-            if (res.sign != Sign::NEG)
-            {
-              res.sign = Sign::POS;
-            }
-          }
-        }
+        goto dfloat_parse_sign;
       }
-      else if (c == '.')
+      case '0':
       {
-        if (!decimal_point)
-        {
-          decimal_point = true;
-        }
-        else
-        {
-          res.sign = Sign::_NAN_;
-          return res;
-        }
+        goto dfloat_parse_leadz;
+      }
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_whole;
+      }
+      case '.':
+      {
+        goto dfloat_parse_frac;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_sign:
+    if (*it == '+')
+    {
+      sign = Sign::POS;
+    }
+    else
+    {
+      sign = Sign::NEG;
+    }
+
+    if (++it == str.end())
+    {
+      goto dfloat_parse_fail;
+    }
+
+    switch (*it)
+    {
+      case '0':
+      {
+        goto dfloat_parse_leadz;
+      }
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_whole;
+      }
+      case '.':
+      {
+        goto dfloat_parse_frac;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_leadz:
+    // no action: ignore leading zeroes
+
+    if (++it == str.end())
+    {
+      goto dfloat_parse_zero;
+    }
+
+    switch (*it)
+    {
+      case '0':
+      {
+        goto dfloat_parse_leadz;
+      }
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_whole;
+      }
+      case 'e':
+      case 'E':
+      {
+        goto dfloat_parse_ze1;
+      }
+      case '.':
+      {
+        goto dfloat_parse_frac;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_ze1:
+    // no action: prepare to parse exponent
+
+    if (++it == str.end())
+    {
+      goto dfloat_parse_fail;
+    }
+
+    switch (*it)
+    {
+      case '+':
+      case '-':
+      {
+        goto dfloat_parse_zes;
+      }
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_ze2;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_zes:
+    // no action: doesn't matter what sign exponent is after zero
+
+    if (++it == str.end())
+    {
+      goto dfloat_parse_fail;
+    }
+
+    switch (*it)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_ze2;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_ze2:
+    // no action: doesn't matter what exponent is after zero
+    
+    if (++it == str.end())
+    {
+      goto dfloat_parse_zero;
+    }
+
+    switch (*it)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_ze2;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_whole:
+    /*
+      If mant is would exceed its maximum, we must truncate. This results in
+      data loss if the digit is not '0'
+    */
+    if (mant >= SCALE)
+    {
+      /*
+        If we cannot increment power any further, then the whole number part is
+        out of range. Even if the exponent were to bring the result back into
+        range, we will return NaN
+      */
+      if (pow >= MAX_POW)
+      {
+        goto dfloat_parse_fail;
       }
       else
       {
-        res.sign = Sign::_NAN_;
-        return res;
+        ++pow;
       }
-
-
-      first_char = false;
+    }
+    /*
+      If mant is still small, we can just append to mant
+    */
+    else
+    {
+      // we only transition into whole state after a digit 0-9
+      mant = mant * BASE + ((*it) - '0');
+    }
+    
+    if (++it == str.end())
+    {
+      goto dfloat_parse_done;
     }
 
-    /* edge case: zero value */
-    if (res.mant == 0)
+    switch (*it)
     {
-      res.sign = Sign::ZERO;
-      return res;
-    }
-
-    /* at the end, scale up the mantissa if necessary */
-    while (res.mant < SCALE)
-    {
-      res.mant *= BASE;
-      if (res.pow-- <= MIN_POW)
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
       {
-        res.sign = Sign::_NAN_;
-        return res;
+        goto dfloat_parse_whole;
+      }
+      case 'e':
+      case 'E':
+      {
+        goto dfloat_parse_e1;
+      }
+      case '.':
+      {
+        goto dfloat_parse_frac;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
       }
     }
 
-    return res;
+dfloat_parse_frac:
+    /*
+      If we just scanned decimal point, no action needs to be taken
+    */
+    if (*it == '.')
+    {
+
+    }
+    /*
+      Otherwise, we read a digit
+    */
+    else
+    {
+      /*
+        If mant is would exceed its maximum, we must truncate. This results in
+        data loss if the digit is not '0'
+      */
+      if (mant >= SCALE)
+      {
+        // effectively ignoring any decimal places that are too small
+      }
+      /*
+        If mant is still small, we can append to mant and decrement pow
+      */
+      else
+      {
+        /*
+          If we cannot decrement power any further, then the fractional part is
+          out of range. Even if the exponent were to bring the result back into
+          range, we will return NaN
+        */
+        if (pow <= MIN_POW)
+        {
+          goto dfloat_parse_fail;
+        }
+        else
+        {
+          --pow;
+          // at this point we know it's a digit and not a decimal point
+          mant = mant * BASE + ((*it) - '0');
+        }
+      }
+    }
+
+    if (++it == str.end())
+    {
+      goto dfloat_parse_done;
+    }
+
+    switch (*it)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_frac;
+      }
+      case 'e':
+      case 'E':
+      {
+        goto dfloat_parse_e1;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_e1:
+    /*
+      Make sure mant is between SCALE and SCALE*BASE before proceeding
+    */
+    while (mant < SCALE)
+    {
+      if (pow >= MAX_POW)
+      {
+        goto dfloat_parse_fail;
+      }
+
+      mant *= BASE;
+      --pow;
+    }
+
+    if (++it == str.end())
+    {
+      goto dfloat_parse_fail;
+    }
+
+    switch (*it)
+    {
+      case '+':
+      case '-':
+      {
+        goto dfloat_parse_es;
+      }
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_e2;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_es:
+    if (*it == '+')
+    {
+      exp_sign = 1;
+    }
+    else
+    {
+      exp_sign = -1;
+    }
+
+    if (++it == str.end())
+    {
+      goto dfloat_parse_fail;
+    }
+
+    switch (*it)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_e2;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_e2:
+    /*
+      Make sure pow will not fall out of range if we append
+    */
+    if (exp_sign > 0)
+    {
+      if (pow > MAX_POW / BASE)
+      {
+        goto dfloat_parse_fail;
+      }
+
+      pow *= BASE;
+
+      pow_t add_pow = (*it) - '0';
+
+      // MAX_POW - pow is valid here because of integer promotion
+      if (add_pow > MAX_POW - pow)
+      {
+        goto dfloat_parse_fail;
+      }
+      
+      pow += add_pow;
+    }
+    else
+    {
+      if (pow < MIN_POW / BASE)
+      {
+        goto dfloat_parse_fail;
+      }
+
+      pow *= BASE;
+
+      pow_t subtract_pow = (*it) - '0';
+
+      // MIN_POW - pow is valid here because of integer promotion
+      if (subtract_pow < MIN_POW - pow)
+      {
+        goto dfloat_parse_fail;
+      }
+      
+      pow -= subtract_pow;
+    }
+
+    if (++it == str.end())
+    {
+      goto dfloat_parse_done;
+    }
+
+    switch (*it)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_e2;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_zero:
+    return dfloat(Sign::ZERO, 0, 0);
+
+dfloat_parse_fail:
+    return dfloat(Sign::_NAN_, 0, 0);
+
+dfloat_parse_done:
+    /*
+      Make sure mant is between SCALE and SCALE*BASE before proceeding
+    */
+    while (mant < SCALE)
+    {
+      if (pow >= MAX_POW)
+      {
+        goto dfloat_parse_fail;
+      }
+
+      mant *= BASE;
+      --pow;
+    }
+
+    return dfloat(sign, mant, pow);
   }
 
   inline
@@ -1230,8 +1242,6 @@ namespace xu
       stream << '0';
       return stream;
     }
-
-    stream << '*';
     
     stream.precision(17);
 
