@@ -41,6 +41,10 @@ namespace xu
   class dfloat
   {
   public:
+    using sign_t = int8_t;
+    using mant_t = uint64_t;
+    using pow_t = int8_t;
+
     /**
       @brief  The scale of member variable `mant`
               Equal to 100,000,000 billion
@@ -48,39 +52,39 @@ namespace xu
               addition requires:        2^64 - 1 >= (MANT_CAP - 1) + (MANT_CAP - 1)
               multiplication requires:  2^64 - 1 >= (MANT_CAP - 1) * (MANT_CAP - 1) / SCALE
       */
-    static const uint64_t SCALE = 100000000000000000;
+    static const mant_t SCALE = 100000000000000000;
 
     /**
       @brief  The power of 10 which equals SCALE
       */
-    static const int8_t SCALE_POW = 17;
+    static const pow_t SCALE_POW = 17;
 
     /**
       @brief  Constant to hold base 10
       */
-    static const uint64_t BASE = 10;
+    static const mant_t BASE = 10;
 
     /**
       @brief  The maximum value of `mant`, plus one
               Equal to 1 billion billion
       */
-    static const uint64_t MANT_CAP = BASE * SCALE;
+    static const mant_t MANT_CAP = BASE * SCALE;
 
     /**
       @brief  Highest possible value of `pow`
       */
-    static const int8_t MAX_POW = 127;
+    static const pow_t MAX_POW = 127;
 
     /**
       @brief  Lowest possible value of `pow`
       */
-    static const int8_t MIN_POW = -128;
+    static const pow_t MIN_POW = -128;
 
     /**
       @brief  Represents sign of the mantissa, if there is one, or NaN
       @note   Unlike doubles, dfloats cannot be infinity or -infinity or -nan
       */
-    enum class Sign : int8_t
+    enum class Sign : sign_t
     {
       NEG = -1,
       ZERO = 0,
@@ -109,7 +113,7 @@ namespace xu
       @brief  Verbose constructor
               Construct dfloat from parts
       */
-    dfloat(Sign sign_, uint64_t mant_, int8_t pow_);
+    dfloat(Sign sign_, mant_t mant_, pow_t pow_);
   
   public:
 
@@ -239,14 +243,14 @@ namespace xu
               and represents a number between 1 and 10
                 [ 1.0, 10.0 )
       */
-    uint64_t mant;
+    mant_t mant;
 
     /**
       @brief  Power (base 10) of the expression
               Integer value falls in the range
                 [ MIN_POW, MAX_POW ]
       */
-    int8_t pow;
+    pow_t pow;
     
   public:
 

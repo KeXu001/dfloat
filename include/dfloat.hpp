@@ -29,7 +29,7 @@
 namespace xu
 {
   inline
-  dfloat::dfloat(Sign sign_, uint64_t mant_, int8_t pow_)
+  dfloat::dfloat(Sign sign_, mant_t mant_, pow_t pow_)
     : sign(sign_),
       mant(mant_),
       pow(pow_)
@@ -152,7 +152,7 @@ namespace xu
       ++pow;
     }
 
-    mant = (uint64_t)(value * SCALE);
+    mant = (mant_t)(value * SCALE);
 
     /*
       I think there may be rounding errors when converting value to mant
@@ -194,7 +194,7 @@ namespace xu
       and we use 8 bits for the base-10 exponent
         log10(2^(2^11)) >= log10(10^(2^8))
       */
-    int8_t pow_to_zero = pow;
+    pow_t pow_to_zero = pow;
     while (pow_to_zero > 0)
     {
       res *= BASE;
@@ -321,10 +321,10 @@ namespace xu
 
       res.sign = sign;
 
-      uint64_t a_mant = mant;
-      int8_t a_pow = pow;
-      uint64_t b_mant = other.mant;
-      int8_t b_pow = other.pow;
+      mant_t a_mant = mant;
+      pow_t a_pow = pow;
+      mant_t b_mant = other.mant;
+      pow_t b_pow = other.pow;
 
       /* scale the smaller magnitude number to match the larger magnitude number */
       while (a_pow < b_pow)
@@ -374,8 +374,8 @@ namespace xu
       }
 
       /* a will hold the larger magnitude number */
-      uint64_t a_mant, b_mant;
-      int8_t a_pow, b_pow;
+      mant_t a_mant, b_mant;
+      pow_t a_pow, b_pow;
 
       /* this is larger magnitude than other */
       if (compare > 0)
@@ -465,7 +465,7 @@ namespace xu
         99 million billion * 99 million billion / 100 million billion
         is less than 2^64 - 1
     */
-    res.mant = (uint64_t)(a * b / SCALE);
+    res.mant = (mant_t)(a * b / SCALE);
 
     if (res.mant >= MANT_CAP)
     {
@@ -533,7 +533,7 @@ namespace xu
     }
 
     /* multiply the numerator by scale before dividing */
-    res.mant = (uint64_t)(a * SCALE / b);
+    res.mant = (mant_t)(a * SCALE / b);
 
     return res;
   }
@@ -817,8 +817,8 @@ namespace xu
       int mant_digits_below = SCALE_POW;
 
       /* now shift the digits left/right in base-10 */
-      int8_t pow_it = pow;
-      uint64_t divisor = SCALE;
+      pow_t pow_it = pow;
+      mant_t divisor = SCALE;
       while (pow_it > 0)
       {
         divisor /= BASE;
@@ -854,7 +854,7 @@ namespace xu
       /* print below decimal only if there are nonzero digits */
       if (mant_digits_below > 0)
       {
-        uint64_t mant_below;
+        mant_t mant_below;
         int mant_nz_digits_below = mant_digits_below;
         if (mant_digits_below >= SCALE_POW + 1)
         {
@@ -866,7 +866,7 @@ namespace xu
         }
 
         /* do not print trailing zeros */
-        for (int8_t i = 0; i < mant_digits_below; i++)
+        for (int i = 0; i < mant_digits_below; i++)
         {
           if (mant_below % BASE != 0)
           {
