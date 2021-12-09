@@ -27,7 +27,6 @@
 #include <iomanip>
 #include <iostream>
 #include "dfloat.hpp"
-#include "other_class.h"
 
 #define MAX32 4294967295
 
@@ -35,7 +34,7 @@ typedef xu::dfloat dfloat;
 
 int main()
 {
-  // g++ -o bin/test_dfloat -I../include -Wfatal-errors -Wall test_dfloat.cpp other_class.cpp
+  // g++ -o bin/test_dfloat -I../include -Wfatal-errors -Wall test_dfloat.cpp
   
   std::cout << "sizeof(dfloat)=" << sizeof(dfloat) << std::endl;
 
@@ -53,9 +52,9 @@ int main()
 
   dfloat df1(110.0);
 
-  dfloat df2("110");
+  dfloat df2 = dfloat::parse("110");
 
-  dfloat df3("012310123409010203040.506070809");
+  dfloat df3 = dfloat::parse("012310123409010203040.506070809");
 
   dfloat df4(110.0f);
 
@@ -120,49 +119,45 @@ int main()
   std::cout << std::boolalpha << (df1 > 110) << std::endl;
   std::cout << std::boolalpha << (df2 > 110) << std::endl;
 
-  std::cout << dfloat("100000000.000000001") << std::endl;
+  std::cout << dfloat::parse("100000000.000000001") << std::endl;
 
   double test = 0.1l * 0.1l - 0.01l;
   std::cout << (test == 0) << std::endl;
 
-  dfloat test2 = dfloat("0.1") * dfloat("0.1") - dfloat("0.01");
+  dfloat test2 = dfloat::parse("0.1") * dfloat::parse("0.1") - dfloat::parse("0.01");
   std::cout << (test2 == 0) << std::endl;
 
   double test3 = 0.4l * 0.4l - 0.16l;
   std::cout << test3 << std::endl;
 
-  dfloat test4 = dfloat("0.4") * dfloat("0.4") - dfloat("0.16");
+  dfloat test4 = dfloat::parse("0.4") * dfloat::parse("0.4") - dfloat::parse("0.16");
   std::cout << test4 << std::endl;
 
-  other_class oc;
+  std::cout << (dfloat::parse("20") * 0.1) << "==?" << (0.1 * dfloat::parse("20")) << std::endl;
+  std::cout << (dfloat::parse("20") + 16) << "==?" << (16 + dfloat::parse("20")) << std::endl;
 
-  std::cout << oc.get() << std::endl;
-
-  std::cout << (dfloat("20") * 0.1) << "==?" << (0.1 * dfloat("20")) << std::endl;
-  std::cout << (dfloat("20") + 16) << "==?" << (16 + dfloat("20")) << std::endl;
-
-  std::cout << (dfloat("78.5") <= 78.5) << std::endl;
-  std::cout << (78.5 >= dfloat("78.5")) << std::endl;
+  std::cout << (dfloat::parse("78.5") <= 78.5) << std::endl;
+  std::cout << (78.5 >= dfloat::parse("78.5")) << std::endl;
   
-  assert(dfloat(0) == dfloat("0"));
+  assert(dfloat(0) == dfloat::parse("0"));
 
-  assert(dfloat("10") + dfloat("20") == dfloat("30"));
-  assert(dfloat("10") - dfloat("20") == dfloat("-10"));
-  assert(dfloat("10") + dfloat("10") == dfloat("20"));
-  assert(dfloat("10") - dfloat("10") == dfloat("0"));
+  assert(dfloat::parse("10") + dfloat::parse("20") == dfloat::parse("30"));
+  assert(dfloat::parse("10") - dfloat::parse("20") == dfloat::parse("-10"));
+  assert(dfloat::parse("10") + dfloat::parse("10") == dfloat::parse("20"));
+  assert(dfloat::parse("10") - dfloat::parse("10") == dfloat::parse("0"));
 
-  assert(-dfloat("12345") == dfloat("-12345"));
-  assert(-dfloat("0") == dfloat("0"));
+  assert(-dfloat::parse("12345") == dfloat::parse("-12345"));
+  assert(-dfloat::parse("0") == dfloat::parse("0"));
 
-  assert(dfloat("123") * dfloat("123") == dfloat("15129"));
-  assert(-dfloat("123") * dfloat("123") == dfloat("-15129"));
-  assert(dfloat("1000") / dfloat("250") == dfloat("4"));
-  assert(dfloat("1000") / -dfloat("1000") == dfloat("-1"));
+  assert(dfloat::parse("123") * dfloat::parse("123") == dfloat::parse("15129"));
+  assert(-dfloat::parse("123") * dfloat::parse("123") == dfloat::parse("-15129"));
+  assert(dfloat::parse("1000") / dfloat::parse("250") == dfloat::parse("4"));
+  assert(dfloat::parse("1000") / -dfloat::parse("1000") == dfloat::parse("-1"));
 
-  assert((double)(dfloat("0.2") - dfloat("0.3")) == -0.1);
+  assert((double)(dfloat::parse("0.2") - dfloat::parse("0.3")) == -0.1);
   
-  std::cout << dfloat((double)dfloat("0.2")) << std::endl;
-  std::cout << dfloat((float)dfloat("0.2")) << std::endl;
+  std::cout << dfloat((double)dfloat::parse("0.2")) << std::endl;
+  std::cout << dfloat((float)dfloat::parse("0.2")) << std::endl;
   
   dfloat nan = dfloat(1)/dfloat(0);
   std::cout << nan << std::endl;
@@ -192,10 +187,10 @@ int main()
   assert(!dfloat::isfinite(nan*dfloat(1)));
   assert(!dfloat::isfinite(nan/dfloat(1)));
   
-  assert(!dfloat::isfinite(dfloat("bogus")));
-  assert(!dfloat::isfinite(dfloat("--1")));
-  assert(!dfloat::isfinite(dfloat("1e10")));
-  assert(!dfloat::isfinite(dfloat("+5")));
+  assert(!dfloat::isfinite(dfloat::parse("bogus")));
+  assert(!dfloat::isfinite(dfloat::parse("--1")));
+  assert(!dfloat::isfinite(dfloat::parse("1e10")));
+  assert(!dfloat::isfinite(dfloat::parse("+5")));
   
   assert(dfloat::isfinite(dfloat(1e127) + dfloat(89999999e127)));
   assert(dfloat::isfinite(dfloat(1e127) + dfloat(89999999e127)));
@@ -220,7 +215,7 @@ int main()
   assert(!dfloat::isfinite(dfloat(5e100)*dfloat(2e27)));
   assert(dfloat::isfinite(dfloat(5e-100)*dfloat(2e-29)));
   
-  dfloat orig("16");
+  dfloat orig = dfloat::parse("16");
   dfloat copy1(orig);
   dfloat copy2 = orig;
   
@@ -229,9 +224,9 @@ int main()
   
   dfloat copy3(std::move(orig));
   
-  assert(copy3 == dfloat("16"));
+  assert(copy3 == dfloat::parse("16"));
   
   dfloat copy4 = std::move(copy3);
   
-  assert(copy4 == dfloat("16"));
+  assert(copy4 == dfloat::parse("16"));
 }

@@ -261,12 +261,12 @@ namespace xu
       @note   Leading zeros are ignored.
       @note   If bad format, results in NaN
       */
-    dfloat(const std::string& str);
+    static dfloat parse(const std::string& str);
 
     /**
       @brief  Convert to string
       */
-    explicit operator std::string() const;
+    static std::string to_string(const dfloat& d);
 
     /**
       @brief  Converts dfloat to string on stream

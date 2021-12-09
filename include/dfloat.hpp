@@ -636,18 +636,20 @@ namespace xu
   }
 
   inline
-  dfloat::dfloat(const std::string& str)
+  dfloat dfloat::parse(const std::string& str)
   {
+    dfloat res;
+
     /* edge case: str is empty */
     if (str.length() < 1)
     {
-      sign = Sign::_NAN_;
-      return;
+      res.sign = Sign::_NAN_;
+      return res;
     }
 
-    sign = Sign::ZERO;
-    mant = 0;
-    pow = SCALE_POW;
+    res.sign = Sign::ZERO;
+    res.mant = 0;
+    res.pow = SCALE_POW;
 
     /* whether the string contains a decimal point */
     bool decimal_point = false;
@@ -664,12 +666,12 @@ namespace xu
       {
         if (first_char)
         {
-          sign = Sign::NEG;
+          res.sign = Sign::NEG;
         }
         else
         {
-          sign = Sign::_NAN_;
-          return;
+          res.sign = Sign::_NAN_;
+          return res;
         }
       }
       else if (c >= '0' and c <= '9')
@@ -686,29 +688,29 @@ namespace xu
         }
 
         /* if mant already holds max digits, do not add any more, just increase power if above decimal point */
-        if (mant >= SCALE)
+        if (res.mant >= SCALE)
         {
           if (!decimal_point)
           {
-            if (pow++ >= MAX_POW)
+            if (res.pow++ >= MAX_POW)
             {
-              sign = Sign::_NAN_;
-              return;
+              res.sign = Sign::_NAN_;
+              return res;
             }
           }
         }
         /* otherwise, append digit to mant */
         else
         {
-          mant = mant * 10 + (c - '0');
+          res.mant = res.mant * 10 + (c - '0');
 
           /* if we are below decimal, we need to decrease power to compensate for appending to mant */
           if (decimal_point)
           {
-            if (pow-- <= MIN_POW)
+            if (res.pow-- <= MIN_POW)
             {
-              sign = Sign::_NAN_;
-              return;
+              res.sign = Sign::_NAN_;
+              return res;
             }
           }
         }
@@ -718,9 +720,9 @@ namespace xu
           /* if first nonzero digit, set to POS sign (unless already NEG); then increment nonzer_digits */
           if (nonzero_digits++ == 0)
           {
-            if (sign != Sign::NEG)
+            if (res.sign != Sign::NEG)
             {
-              sign = Sign::POS;
+              res.sign = Sign::POS;
             }
           }
         }
@@ -733,14 +735,14 @@ namespace xu
         }
         else
         {
-          sign = Sign::_NAN_;
-          return;
+          res.sign = Sign::_NAN_;
+          return res;
         }
       }
       else
       {
-        sign = Sign::_NAN_;
-        return;
+        res.sign = Sign::_NAN_;
+        return res;
       }
 
 
@@ -748,30 +750,32 @@ namespace xu
     }
 
     /* edge case: zero value */
-    if (mant == 0)
+    if (res.mant == 0)
     {
-      sign = Sign::ZERO;
-      return;
+      res.sign = Sign::ZERO;
+      return res;
     }
 
     /* at the end, scale up the mantissa if necessary */
-    while (mant < SCALE)
+    while (res.mant < SCALE)
     {
-      mant *= BASE;
-      if (pow-- <= MIN_POW)
+      res.mant *= BASE;
+      if (res.pow-- <= MIN_POW)
       {
-        sign = Sign::_NAN_;
-        return;
+        res.sign = Sign::_NAN_;
+        return res;
       }
     }
+
+    return res;
   }
 
   inline
-  dfloat::operator std::string() const
+  std::string dfloat::to_string(const dfloat& d)
   {
     std::stringstream ss;
 
-    print(ss);
+    d.print(ss);
 
     return ss.str();
   }
@@ -792,6 +796,10 @@ namespace xu
       stream << '0';
       return stream;
     }
+
+    stream << '*';
+    
+    stream.precision(17);
 
     /* save current format flags so we can reset our manipulators when we are done */
     std::ios_base::fmtflags orig_stream_flags(stream.flags());
