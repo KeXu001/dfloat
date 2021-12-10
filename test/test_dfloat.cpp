@@ -160,23 +160,35 @@ void conversions()
     assert(std::isnan(d));
   }
 
-  // {
-  //   dfloat f = dfloat::parse("0");
-  //   int i = (int)f;
-  //   assert(i == 0);
-  // }
+  {
+    dfloat f = dfloat::parse("0");
+    uint16_t i = (uint16_t)f;
+    assert(i == 0);
+  }
 
-  // {
-  //   dfloat f = dfloat::parse("1");
-  //   int i = (int)f;
-  //   assert(i == 1);
-  // }
+  {
+    dfloat f = dfloat::parse("1");
+    uint16_t i = (uint16_t)f;
+    assert(i == 1);
+  }
 
-  // {
-  //   dfloat f = dfloat::parse("-1");
-  //   int i = (int)f;
-  //   assert(i == -1);
-  // }
+  {
+    dfloat f = dfloat::parse("10000");
+    uint16_t i = (uint16_t)f;
+    assert(i == 10000);
+  }
+
+  {
+    dfloat f = dfloat::parse("-1");
+    uint16_t i = (uint16_t)f;
+    assert(i == 65535);
+  }
+
+  {
+    dfloat f = dfloat::parse("65536");
+    uint16_t i = (uint16_t)f;
+    assert(i == 0);
+  }
 }
 
 void to_from_strings()

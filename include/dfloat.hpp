@@ -151,16 +151,31 @@ namespace xu
     mant = (mant_t)(value * SCALE);
   }
 
-  // template <
-  //   typename T,
-  //   typename std::enable_if_t<
-  //     std::is_integral<T>::value && std::is_unsigned<T>::value,
-  //     bool> = true>
-  // inline
-  // dfloat::operator T() const
-  // {
-  //   const T_max = std::numeric_limits<T>::max();
-  // }
+  template <
+    typename T,
+    typename std::enable_if_t<
+      std::is_integral<T>::value && std::is_unsigned<T>::value,
+      bool> = true>
+  inline
+  dfloat::operator T() const
+  {
+    const T T_max = std::numeric_limits<T>::max();
+
+    /* perform modulo in dfloat-land */
+    dfloat rem(operator%(dfloat(T_max) + 1));
+    
+    /*
+      scale until `pow` equals -SCALE_POW, so that `mant` is equal to the
+      integer value represented
+    */
+    while (rem.pow < SCALE_POW)
+    {
+      rem.mant /= BASE;
+      ++rem.pow;
+    }
+
+    return (T)(rem.mant);
+  }
 
   template <
     typename T,
