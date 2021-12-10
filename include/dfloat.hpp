@@ -159,7 +159,7 @@ namespace xu
   inline
   dfloat::operator T() const
   {
-    const T T_max = std::numeric_limits<T>::max();
+    constexpr T T_max = std::numeric_limits<T>::max();
 
     /* perform modulo in dfloat-land */
     dfloat rem(operator%(dfloat(T_max) + 1));
@@ -1504,7 +1504,7 @@ dfloat_parse_done:
       else
       {
         /* enough digits to capture the power */
-        const size_t POW_BUF_SIZE = 3;
+        constexpr size_t POW_BUF_SIZE = 3;
         char pow_buf[POW_BUF_SIZE] = {0};
         size_t pow_idx = POW_BUF_SIZE - 1;  // initially set to the last index of `pow_buf`
 
