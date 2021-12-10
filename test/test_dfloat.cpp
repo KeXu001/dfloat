@@ -189,6 +189,30 @@ void conversions()
     uint16_t i = (uint16_t)f;
     assert(i == 0);
   }
+
+  {
+    dfloat f = dfloat::parse("0");
+    int16_t i = (int16_t)f;
+    assert(i == 0);
+  }
+
+  {
+    dfloat f = dfloat::parse("32767");
+    int16_t i = (int16_t)f;
+    assert(i == 32767);
+  }
+
+  {
+    dfloat f = dfloat::parse("32768");
+    int16_t i = (int16_t)f;
+    assert(i == -32768);
+  }
+
+  {
+    dfloat f = dfloat::parse("65536");
+    int16_t i = (int16_t)f;
+    assert(i == 0);
+  }
 }
 
 void to_from_strings()

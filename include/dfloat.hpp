@@ -163,7 +163,7 @@ namespace xu
 
     /* perform modulo in dfloat-land */
     dfloat rem(operator%(dfloat(T_max) + 1));
-    
+
     /*
       scale until `pow` equals -SCALE_POW, so that `mant` is equal to the
       integer value represented
@@ -175,6 +175,22 @@ namespace xu
     }
 
     return (T)(rem.mant);
+  }
+
+  /* assume that cast from unsigned to signed is correct mapping */
+  template <
+    typename T,
+    typename std::enable_if_t<
+      std::is_integral<T>::value && std::is_signed<T>::value,
+      bool> = true>
+  inline
+  dfloat::operator T() const
+  {
+    using U = typename std::make_unsigned<T>::type;
+
+    U res_unsigned = operator U();
+
+    return (T)res_unsigned;
   }
 
   template <
