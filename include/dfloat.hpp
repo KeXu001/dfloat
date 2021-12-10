@@ -67,6 +67,10 @@ namespace xu
     }
   }
 
+  /*
+    Passes abs(value) to the overload for unsigned types, and then sets sign
+    if necessary
+  */
   template <
     typename T,
     typename std::enable_if_t<
@@ -74,33 +78,11 @@ namespace xu
       bool> = true>
   inline
   dfloat::dfloat(T value)
+    : dfloat(typename std::make_unsigned<T>::type(value > 0 ? value : -value))
   {
-    if (value == 0)
-    {
-      sign = Sign::ZERO;
-      return;
-    }
-    else if (value > 0)
-    {
-      sign = Sign::POS;
-      mant = value;
-    }
-    else
+    if (value < 0)
     {
       sign = Sign::NEG;
-      mant = -value;
-    }
-
-    pow = SCALE_POW;
-    while (mant < SCALE)
-    {
-      mant *= BASE;
-      --pow;
-    }
-    while (mant >= MANT_CAP)
-    {
-      mant /= BASE;
-      ++pow;
     }
   }
 
@@ -169,6 +151,17 @@ namespace xu
     mant = (mant_t)(value * SCALE);
   }
 
+  // template <
+  //   typename T,
+  //   typename std::enable_if_t<
+  //     std::is_integral<T>::value && std::is_signed<T>::value,
+  //     bool> = true>
+  // inline
+  // dfloat::operator T() const
+  // {
+
+  // }
+
   template <
     typename T,
     typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
@@ -181,7 +174,7 @@ namespace xu
     }
     else if (sign == Sign::_NAN_)
     {
-      return std::numeric_limits<T>::quit_NaN();
+      return std::numeric_limits<T>::quiet_NaN();
     }
 
     T res = mant;

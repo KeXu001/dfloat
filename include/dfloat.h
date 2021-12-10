@@ -158,6 +158,13 @@ namespace xu
       typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
     dfloat(T value);
     
+    // template <
+    //   typename T,
+    //   typename std::enable_if_t<
+    //     std::is_integral<T>::value && std::is_signed<T>::value,
+    //     bool> = true>
+    // explicit operator T() const;
+
     template <
       typename T,
       typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>

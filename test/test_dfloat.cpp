@@ -28,6 +28,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include "dfloat.hpp"
 
 typedef xu::dfloat dfloat;
@@ -42,58 +43,67 @@ void constructors()
 
   {
     dfloat f(0);
+    assert(f == 0);
   }
 
   {
     dfloat f1(0);
     dfloat f2(f1);
+    assert(f1 == f2);
   }
 
   {
     dfloat f1(0);
-    __attribute__((__unused__))
     dfloat f2 = f1;
+    assert(f1 == f2);
   }
 
   {
     dfloat f1(0);
     dfloat f2(std::move(f1));
+    assert(f1 == f2);
   }
 
   {
     dfloat f1(0);
-    __attribute__((__unused__))
     dfloat f2 = std::move(f1);
+    assert(f1 == f2);
   }
 
   {
     int16_t x = -32768;
     dfloat f(x);
+    assert(f - 1 == -32769);
   }
 
   {
     uint16_t x = 65535;
     dfloat f(x);
+    assert(f + 1 == 65536);
   }
 
   {
     int32_t x = -2147483648;
     dfloat f(x);
+    assert(f - 1 == -2147483649);
   }
 
   {
     uint32_t x = 4294967295;
     dfloat f(x);
+    assert(f + 1 == 4294967296);
   }
 
   {
-    int64_t x = -9223372036854775808ul;
+    int64_t x = -1-9223372036854775807ll;  // stackoverflow 57105469
     dfloat f(x);
+    assert(f - 1 == dfloat::parse("-9223372036854775809"));
   }
 
   {
     uint64_t x = 18446744073709551615ull;
     dfloat f(x);
+    assert(f + 1 == dfloat::parse("18446744073709551616"));
   }
 
   {
@@ -110,6 +120,63 @@ void constructors()
     long double x = 0.1;
     dfloat f(x);
   }
+}
+
+void conversions()
+{
+  {
+    dfloat f = dfloat::parse("0.1");
+    double d = (double)f;
+    assert(d == 0.1);
+  }
+
+  {
+    dfloat f = dfloat::parse("10");
+    double d = (double)f;
+    assert(d == 10);
+  }
+
+  {
+    dfloat f = dfloat::parse("0.1");
+    float d = (float)f;
+    assert(d == 0.1f);
+  }
+
+  {
+    dfloat f = dfloat::parse("10");
+    float d = (float)f;
+    assert(d == 10);
+  }
+
+  {
+    dfloat f = dfloat::parse("nan");
+    double d = (double)f;
+    assert(std::isnan(d));
+  }
+
+  {
+    dfloat f = dfloat::parse("nan");
+    float d = (float)f;
+    assert(std::isnan(d));
+  }
+
+  // {
+  //   dfloat f = dfloat::parse("0");
+  //   int i = (int)f;
+  //   assert(i == 0);
+  // }
+
+  // {
+  //   dfloat f = dfloat::parse("1");
+  //   int i = (int)f;
+  //   assert(i == 1);
+  // }
+
+  // {
+  //   dfloat f = dfloat::parse("-1");
+  //   int i = (int)f;
+  //   assert(i == -1);
+  // }
 }
 
 void to_from_strings()
@@ -1074,6 +1141,8 @@ void denormal()
 int main()
 {
   constructors();
+
+  conversions();
 
   to_from_strings();
 
