@@ -55,37 +55,37 @@ namespace xu
               addition requires:        2^64 - 1 >= (MANT_CAP - 1) + (MANT_CAP - 1)
               multiplication requires:  2^64 - 1 >= (MANT_CAP - 1) * (MANT_CAP - 1) / SCALE
       */
-    static const mant_t SCALE = 100000000000000000;
+    static constexpr mant_t SCALE = 100000000000000000;
 
     /**
       @brief  The power of 10 which equals SCALE
       */
-    static const pow_t SCALE_POW = 17;
+    static constexpr pow_t SCALE_POW = 17;
 
     /**
       @brief  Constant to hold base 10
       @note   Implementation note: we use uint8_t instead of mant_t, otherwise
               some necessary operations will not have integer promotion
       */
-    static const uint8_t BASE = 10;
+    static constexpr uint8_t BASE = 10;
 
     /**
       @brief  The maximum value of `mant`, plus one
               Equal to 1 billion billion
       */
-    static const mant_t MANT_CAP = BASE * SCALE;
+    static constexpr mant_t MANT_CAP = BASE * SCALE;
 
     /**
       @brief  Highest possible value of `pow`
       */
-    static const pow_t MAX_POW = 100;
+    static constexpr pow_t MAX_POW = 100;
 
     /**
       @brief  Lowest possible value of `pow`
       @note   Must be greater than the numeric minimum limit of `pow_t`, so that
               unary minus sign does not result in loss
       */
-    static const pow_t MIN_POW = -100;
+    static constexpr pow_t MIN_POW = -100;
 
     /**
       @brief  Represents sign of the mantissa, if there is one, or NaN
@@ -161,7 +161,7 @@ namespace xu
     // template <
     //   typename T,
     //   typename std::enable_if_t<
-    //     std::is_integral<T>::value && std::is_signed<T>::value,
+    //     std::is_integral<T>::value && std::is_unsigned<T>::value,
     //     bool> = true>
     // explicit operator T() const;
 

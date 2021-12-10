@@ -154,12 +154,12 @@ namespace xu
   // template <
   //   typename T,
   //   typename std::enable_if_t<
-  //     std::is_integral<T>::value && std::is_signed<T>::value,
+  //     std::is_integral<T>::value && std::is_unsigned<T>::value,
   //     bool> = true>
   // inline
   // dfloat::operator T() const
   // {
-
+    
   // }
 
   template <
