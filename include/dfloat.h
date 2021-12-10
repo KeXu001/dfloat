@@ -27,6 +27,7 @@
 #include <cmath>
 #include <cstdint>
 #include <iomanip>
+#include <limits>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -75,12 +76,14 @@ namespace xu
     /**
       @brief  Highest possible value of `pow`
       */
-    static const pow_t MAX_POW = 127;
+    static const pow_t MAX_POW = 100;
 
     /**
       @brief  Lowest possible value of `pow`
+      @note   Must be greater than the numeric minimum limit of `pow_t`, so that
+              unary minus sign does not result in loss
       */
-    static const pow_t MIN_POW = -128;
+    static const pow_t MIN_POW = -100;
 
     /**
       @brief  Represents sign of the mantissa, if there is one, or NaN
@@ -92,6 +95,15 @@ namespace xu
       ZERO = 0,
       POS = 1,
       
+      _NAN_ = 2
+    };
+
+    enum class ComparisonResult : sign_t
+    {
+      LESS = -1,
+      EQUAL = 0,
+      MORE = 1,
+
       _NAN_ = 2
     };
 
@@ -187,6 +199,7 @@ namespace xu
     */
 
     dfloat operator-() const;
+    dfloat operator+() const;
 
     /**
       @brief  Add a dfloat
@@ -219,14 +232,14 @@ namespace xu
       @brief  Returns which operand is greater
       @return 1 if greater than other, -1 if less than other, 0 if equal, 2 if no comparison
       */
-    short _comparedTo(const dfloat& other) const;
+    ComparisonResult _comparedTo(const dfloat& other) const;
 
     /**
       @brief  Returns which operand has larger magnitude
       @note   Assumes both numbers are valid and finite
       @return 1 if bigger than other, -1 if smaller than other, 0 if equal, 2 if no comparison
       */
-    short _compareMagnitudeTo(const dfloat& other) const;
+    ComparisonResult _compareMagnitudeTo(const dfloat& other) const;
 
   protected:
     //  ================
@@ -264,11 +277,15 @@ namespace xu
     /**
       @brief  Parse string as dfloat
               String must be in decimal or scientific notation.
-      @note   Leading zeros are ignored.
+      @note   Leading and trailing zeros are ignored.
       @note   Sign (+/-) is supported before the integral part as well as the
               exponent.
+      @note   Exponent must be preceded by and followed by a digit
+      @note   Decimal must be preceded by and followed by a digit, otherwise "."
+              would be a valid number
       @note   If bad format, result is NaN.
       @note   If outside range, result is NaN.
+      @todo   Make it possible to tell between bad format and outside range.
       @note   If whole number part exceeds range, or if exponent exceeds
               exponent range, result will be NaN, even if the exponent would
               bring it back within range e.g. "10...0e-200" would fail
@@ -278,13 +295,19 @@ namespace xu
     /**
       @brief  Convert to string
       */
-    static std::string to_string(const dfloat& d);
+    static std::string to_string(const dfloat& d, int16_t exp_thresh = 10);
 
     /**
       @brief  Converts dfloat to string on stream
-      @note   Output is always in decimal notation (never scientific notation)
+      @param  exp_thresh  use scientific notation if exponent is of equal or
+                          larger magnitude than this value
+                            if zero or below: always use scientific
+                            if between 1 and MAX_POW: sometimes use scientific
+                            if above MAX_POW: never use scientific
+      @note   Implementation note: we use int16_t because it is wider than
+              pow_t, which is necessarily required
       */
-    std::ostream& print(std::ostream& stream) const;
+    std::ostream& print_to(std::ostream& stream, int16_t exp_thresh = 10) const;
     
     //  ==============
     //  Static Methods

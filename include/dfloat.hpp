@@ -173,7 +173,7 @@ namespace xu
     }
     else if (sign == Sign::_NAN_)
     {
-      return NAN;
+      return std::numeric_limits<T>::quit_NaN();
     }
 
     T res = mant;
@@ -210,37 +210,49 @@ namespace xu
   inline
   bool dfloat::operator==(const dfloat& other) const
   {
-    return 0 == _comparedTo(other);
+    ComparisonResult r = _comparedTo(other);
+
+    return r == ComparisonResult::EQUAL;
   }
 
   inline
   bool dfloat::operator!=(const dfloat& other) const
   {
-    return 0 != _comparedTo(other);
+    ComparisonResult r = _comparedTo(other);
+
+    return r != ComparisonResult::EQUAL and r != ComparisonResult::_NAN_;
   }
 
   inline
   bool dfloat::operator>(const dfloat& other) const
   {
-    return 1 == _comparedTo(other);
+    ComparisonResult r = _comparedTo(other);
+
+    return r == ComparisonResult::MORE;
   }
 
   inline
   bool dfloat::operator<(const dfloat& other) const
   {
-    return -1 == _comparedTo(other);
+    ComparisonResult r = _comparedTo(other);
+
+    return r == ComparisonResult::LESS;
   }
 
   inline
   bool dfloat::operator>=(const dfloat& other) const
   {
-    return 0 <= _comparedTo(other);
+    ComparisonResult r = _comparedTo(other);
+
+    return r == ComparisonResult::EQUAL or r == ComparisonResult::MORE;
   }
 
   inline
   bool dfloat::operator<=(const dfloat& other) const
   {
-    return 0 >= _comparedTo(other);
+    ComparisonResult r = _comparedTo(other);
+
+    return r == ComparisonResult::EQUAL or r == ComparisonResult::LESS;
   }
 
   inline
@@ -283,6 +295,13 @@ namespace xu
         return dfloat(Sign::_NAN_, 0, 0);
     }
   }
+
+  inline
+  dfloat dfloat::operator+() const
+  {
+    return *this;
+  }
+
 
   inline
   dfloat dfloat::operator+(const dfloat& other) const
@@ -356,10 +375,10 @@ namespace xu
     {
       dfloat res(Sign::ZERO, 0, 0);
 
-      short compare = _compareMagnitudeTo(other);
+      ComparisonResult compare = _compareMagnitudeTo(other);
 
       /* equal but opposite */
-      if (compare == 0)
+      if (compare == ComparisonResult::EQUAL)
       {
         return res;
       }
@@ -369,7 +388,7 @@ namespace xu
       pow_t a_pow, b_pow;
 
       /* this is larger magnitude than other */
-      if (compare > 0)
+      if (compare > ComparisonResult::MORE)
       {
         a_mant = mant;
         a_pow = pow;
@@ -530,12 +549,12 @@ namespace xu
   }
 
   inline
-  short dfloat::_comparedTo(const dfloat& other) const
+  dfloat::ComparisonResult dfloat::_comparedTo(const dfloat& other) const
   {
     /* if either is nan, there is no comparison */
     if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
     {
-      return 2;
+      return ComparisonResult::_NAN_;
     }
     
     switch (sign)
@@ -548,7 +567,7 @@ namespace xu
             break;  // sign match, need to compare magnitude
           case Sign::ZERO:
           case Sign::POS:
-            return -1;
+            return ComparisonResult::LESS;
           default:
             break;
         }
@@ -559,11 +578,11 @@ namespace xu
         switch (other.sign)
         {
           case Sign::NEG:
-            return 1;
+            return ComparisonResult::MORE;
           case Sign::ZERO:
-            return 0;
+            return ComparisonResult::EQUAL;
           case Sign::POS:
-            return -1;
+            return ComparisonResult::LESS;
           default:
             break;
         }
@@ -575,7 +594,7 @@ namespace xu
         {
           case Sign::NEG:
           case Sign::ZERO:
-            return 1;
+            return ComparisonResult::MORE;
           case Sign::POS:
             break;  // sign match, need to compare magnitude
           default:
@@ -594,34 +613,45 @@ namespace xu
     }
     else
     {
-      return -_compareMagnitudeTo(other);
+      ComparisonResult r = _compareMagnitudeTo(other);
+
+      if (r == ComparisonResult::MORE)
+      {
+        r = ComparisonResult::LESS;
+      }
+      else if (r == ComparisonResult::LESS)
+      {
+        r = ComparisonResult::MORE;
+      }
+
+      return r;
     }
   }
 
   inline
-  short dfloat::_compareMagnitudeTo(const dfloat& other) const
+  dfloat::ComparisonResult dfloat::_compareMagnitudeTo(const dfloat& other) const
   {
     if (pow > other.pow)
     {
-      return 1;
+      return ComparisonResult::MORE;
     }
     else if (pow < other.pow)
     {
-      return -1;
+      return ComparisonResult::LESS;
     }
     else
     {
       if (mant > other.mant)
       {
-        return 1;
+        return ComparisonResult::MORE;
       }
       else if (mant < other.mant)
       {
-        return -1;
+        return ComparisonResult::LESS;
       }
       else
       {
-        return 0;
+        return ComparisonResult::EQUAL;
       }
     }
   }
@@ -632,11 +662,11 @@ namespace xu
       descr {action}                next char --> next state
     state                           +       -       0       1-9     eE      .       end     other
     ------------------------------------------------------------------------------------------------
-    begin                           sign    sign    leadz   whole   fail    frac    fail    fail
+    begin                           sign    sign    leadz   whole   fail    fail    fail    fail
       initial state
-    sign                            fail    fail    leadz   whole   fail    frac    fail    fail
+    sign                            fail    fail    leadz   whole   fail    fail    fail    fail
       just parsed a sign
-    leadz                           fail    fail    leadz   whole   ze1     frac    zero    fail
+    leadz                           fail    fail    leadz   whole   ze1     frac1   zero    fail
       zeros in front of decimal
     ze1                             zes     zes     ze2     ze2     fail    fail    fail    fail
       parsed an e/E after zero,
@@ -647,12 +677,16 @@ namespace xu
     ze2                             fail    fail    ze2     ze2     fail    fail    zero    fail
       parsed digits after e/E
       after zero, expecting digits
-    whole                           fail    fail    whole   whole   e1      frac    done    fail
+    whole                           fail    fail    whole   whole   e1      frac1   done    fail
       already saw first digit, in
       integral part
-    frac                            fail    fail    frac    frac    e1      fail    done    fail
-      already saw decimal point,
+    frac1                           fail    fail    frac2   frac2   fail    fail    fail    fail
+      parsed a decimal point,
       expecting digits or exp
+    frac2                           fail    fail    frac2   frac2   e1      fail    done    fail
+      parsed digits after decimal
+      point, expecting digits or
+      exp
     e1                              es      es      e2      e2      fail    fail    fail    fail
       parsed an e/E, expecting
       sign or digits
@@ -671,8 +705,6 @@ namespace xu
       {return number}
 
   */
-
-
   inline
   dfloat dfloat::parse(const std::string& str)
   {
@@ -681,6 +713,7 @@ namespace xu
     pow_t pow = SCALE_POW;
 
     sign_t exp_sign = 1;
+    pow_t exp_pow = 0;
 
     auto it = str.begin();
 
@@ -717,7 +750,7 @@ namespace xu
       }
       case '.':
       {
-        goto dfloat_parse_frac;
+        goto dfloat_parse_fail;
       }
       default:
       {
@@ -760,7 +793,7 @@ dfloat_parse_sign:
       }
       case '.':
       {
-        goto dfloat_parse_frac;
+        goto dfloat_parse_fail;
       }
       default:
       {
@@ -769,7 +802,7 @@ dfloat_parse_sign:
     }
 
 dfloat_parse_leadz:
-    // no action: ignore leading zeroes
+    /* no action: ignore leading zeroes */
 
     if (++it == str.end())
     {
@@ -801,7 +834,7 @@ dfloat_parse_leadz:
       }
       case '.':
       {
-        goto dfloat_parse_frac;
+        goto dfloat_parse_frac1;
       }
       default:
       {
@@ -810,7 +843,7 @@ dfloat_parse_leadz:
     }
 
 dfloat_parse_ze1:
-    // no action: prepare to parse exponent
+    /* no action: prepare to parse exponent */
 
     if (++it == str.end())
     {
@@ -844,7 +877,7 @@ dfloat_parse_ze1:
     }
 
 dfloat_parse_zes:
-    // no action: doesn't matter what sign exponent is after zero
+    /* no action: doesn't matter what sign exponent is after zero */
 
     if (++it == str.end())
     {
@@ -873,7 +906,7 @@ dfloat_parse_zes:
     }
 
 dfloat_parse_ze2:
-    // no action: doesn't matter what exponent is after zero
+    /* no action: doesn't matter what exponent is after zero */
     
     if (++it == str.end())
     {
@@ -922,12 +955,10 @@ dfloat_parse_whole:
         ++pow;
       }
     }
-    /*
-      If mant is still small, we can just append to mant
-    */
+    /* If mant is still small, we can just append to mant */
     else
     {
-      // we only transition into whole state after a digit 0-9
+      /* we only transition into whole state after a digit 0-9 */
       mant = mant * BASE + ((*it) - '0');
     }
     
@@ -958,7 +989,7 @@ dfloat_parse_whole:
       }
       case '.':
       {
-        goto dfloat_parse_frac;
+        goto dfloat_parse_frac1;
       }
       default:
       {
@@ -966,47 +997,64 @@ dfloat_parse_whole:
       }
     }
 
-dfloat_parse_frac:
-    /*
-      If we just scanned decimal point, no action needs to be taken
-    */
-    if (*it == '.')
+dfloat_parse_frac1:
+    if (++it == str.end())
     {
-
+      goto dfloat_parse_fail;
     }
+
+    switch (*it)
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      {
+        goto dfloat_parse_frac2;
+      }
+      case 'e':
+      case 'E':
+      {
+        goto dfloat_parse_fail;
+      }
+      default:
+      {
+        goto dfloat_parse_fail;
+      }
+    }
+
+dfloat_parse_frac2:
     /*
-      Otherwise, we read a digit
+      If mant is would exceed its maximum, we must truncate. This results in
+      data loss if the digit is not '0'
     */
+    if (mant >= SCALE)
+    {
+      /* effectively ignoring any decimal places that are too small */
+    }
+    /* If mant is still small, we can append to mant and decrement pow */
     else
     {
       /*
-        If mant is would exceed its maximum, we must truncate. This results in
-        data loss if the digit is not '0'
+        If we cannot decrement power any further, then the fractional part is
+        out of range. Even if the exponent were to bring the result back into
+        range, we will return NaN
       */
-      if (mant >= SCALE)
+      if (pow <= MIN_POW)
       {
-        // effectively ignoring any decimal places that are too small
+        goto dfloat_parse_fail;
       }
-      /*
-        If mant is still small, we can append to mant and decrement pow
-      */
       else
       {
-        /*
-          If we cannot decrement power any further, then the fractional part is
-          out of range. Even if the exponent were to bring the result back into
-          range, we will return NaN
-        */
-        if (pow <= MIN_POW)
-        {
-          goto dfloat_parse_fail;
-        }
-        else
-        {
-          --pow;
-          // at this point we know it's a digit and not a decimal point
-          mant = mant * BASE + ((*it) - '0');
-        }
+        --pow;
+        /* at this point we know it's a digit and not a decimal point */
+        mant = mant * BASE + ((*it) - '0');
       }
     }
 
@@ -1028,7 +1076,7 @@ dfloat_parse_frac:
       case '8':
       case '9':
       {
-        goto dfloat_parse_frac;
+        goto dfloat_parse_frac2;
       }
       case 'e':
       case 'E':
@@ -1042,12 +1090,10 @@ dfloat_parse_frac:
     }
 
 dfloat_parse_e1:
-    /*
-      Make sure mant is between SCALE and SCALE*BASE before proceeding
-    */
+    /* Make sure mant is between SCALE and SCALE*BASE before proceeding */
     while (mant < SCALE)
     {
-      if (pow >= MAX_POW)
+      if (pow <= MIN_POW)
       {
         goto dfloat_parse_fail;
       }
@@ -1124,46 +1170,44 @@ dfloat_parse_es:
     }
 
 dfloat_parse_e2:
-    /*
-      Make sure pow will not fall out of range if we append
-    */
+    /* Make sure exp_pow will not fall out of range if we append */
     if (exp_sign > 0)
     {
-      if (pow > MAX_POW / BASE)
+      if (exp_pow > MAX_POW / BASE)
       {
         goto dfloat_parse_fail;
       }
 
-      pow *= BASE;
+      exp_pow *= BASE;
 
       pow_t add_pow = (*it) - '0';
 
-      // MAX_POW - pow is valid here because of integer promotion
-      if (add_pow > MAX_POW - pow)
+      /* MAX_POW - exp_pow is valid here because of integer promotion */
+      if (add_pow > MAX_POW - exp_pow)
       {
         goto dfloat_parse_fail;
       }
       
-      pow += add_pow;
+      exp_pow += add_pow;
     }
     else
     {
-      if (pow < MIN_POW / BASE)
+      if (exp_pow < MIN_POW / BASE)
       {
         goto dfloat_parse_fail;
       }
 
-      pow *= BASE;
+      exp_pow *= BASE;
 
       pow_t subtract_pow = (*it) - '0';
 
-      // MIN_POW - pow is valid here because of integer promotion
-      if (subtract_pow < MIN_POW - pow)
+      /* MIN_POW - exp_pow is valid here because of integer promotion */
+      if (subtract_pow < MIN_POW - exp_pow)
       {
         goto dfloat_parse_fail;
       }
       
-      pow -= subtract_pow;
+      exp_pow -= subtract_pow;
     }
 
     if (++it == str.end())
@@ -1199,12 +1243,10 @@ dfloat_parse_fail:
     return dfloat(Sign::_NAN_, 0, 0);
 
 dfloat_parse_done:
-    /*
-      Make sure mant is between SCALE and SCALE*BASE before proceeding
-    */
+    /* Make sure mant is between SCALE and SCALE*BASE before proceeding */
     while (mant < SCALE)
     {
-      if (pow >= MAX_POW)
+      if (pow <= MIN_POW)
       {
         goto dfloat_parse_fail;
       }
@@ -1213,126 +1255,180 @@ dfloat_parse_done:
       --pow;
     }
 
+    /*
+      Add in the exponent parsed, if any
+      Comparison is valid here because it will promote the integers
+    */
+    if (pow + exp_pow > MAX_POW or pow + exp_pow < MIN_POW)
+    {
+      goto dfloat_parse_fail;
+    }
+
+    pow += exp_pow;
+
     return dfloat(sign, mant, pow);
   }
 
   inline
-  std::string dfloat::to_string(const dfloat& d)
+  std::string dfloat::to_string(const dfloat& d, int16_t exp_thresh)
   {
     std::stringstream ss;
 
-    d.print(ss);
+    d.print_to(ss, exp_thresh);
 
     return ss.str();
   }
 
   inline
-  std::ostream& dfloat::print(std::ostream& stream) const
+  std::ostream& dfloat::print_to(std::ostream& stream, int16_t exp_thresh) const
   {
     /* edge case - nan */
     if (sign == Sign::_NAN_)
     {
-      stream << "NaN";
+      stream << "nan";
       return stream;
     }
     
     /* edge case - zero */
     if (sign == Sign::ZERO)
     {
-      stream << '0';
-      return stream;
+      if (exp_thresh > 0)
+      {
+        stream << '0';
+        return stream;
+      }
+      else
+      {
+        stream << "0.0e0";
+        return stream;
+      }
     }
-    
-    stream.precision(17);
-
-    /* save current format flags so we can reset our manipulators when we are done */
-    std::ios_base::fmtflags orig_stream_flags(stream.flags());
-    stream << std::resetiosflags(orig_stream_flags);
 
     if (sign == Sign::NEG)
     {
       stream << '-';
     }
 
-
+    /* Use scientific notation if past exponent threshold */
+    if (pow >= exp_thresh or pow <= -exp_thresh)
     {
-      /* if pow is zero, how many digits are above/below decimal point */
-      int mant_digits_above = 1;
-      int mant_digits_below = SCALE_POW;
+      mant_t mant_it = mant;
+      size_t place = 0;
 
-      /* now shift the digits left/right in base-10 */
-      pow_t pow_it = pow;
-      mant_t divisor = SCALE;
-      while (pow_it > 0)
+      while (mant_it != 0)
       {
-        divisor /= BASE;
-        ++mant_digits_above;
-        --mant_digits_below;
-        --pow_it;
-      }
-      while (pow_it < 0)
-      {
-        divisor *= BASE;
-        --mant_digits_above;
-        ++mant_digits_below;
-        ++pow_it;
+        mant_t quo = mant_it / SCALE;
+        mant_t rem = mant_it % SCALE;
+
+        char digit = '0' + quo;
+
+        stream << digit;
+
+        if (place == 0)
+        {
+          stream << '.';
+        }
+
+        ++place;
+
+        mant_it = rem * BASE;
       }
 
-      /* print digits above decimal */
-      if (mant_digits_above > 0)
-      {
-        if (mant_digits_above <= SCALE_POW + 1)
-        {
-          stream << (mant / divisor);
-        }
-        else
-        {
-          stream << std::setw(mant_digits_above) << std::setfill('0') << std::left << mant;
-        }
-      }
-      else
+      /*
+        If we only printed a single digit, include a single trailing zero after
+        the decimal point
+      */
+      if (place == 1)
       {
         stream << '0';
       }
 
-      /* print below decimal only if there are nonzero digits */
-      if (mant_digits_below > 0)
+      stream << 'e';
+
+      /* edge case: exponent is zero */
+      if (pow == 0)
       {
-        mant_t mant_below;
-        int mant_nz_digits_below = mant_digits_below;
-        if (mant_digits_below >= SCALE_POW + 1)
+        stream << '0';
+      }
+      else
+      {
+        /* enough digits to capture the power */
+        const size_t POW_BUF_SIZE = 3;
+        char pow_buf[POW_BUF_SIZE] = {0};
+        size_t pow_idx = POW_BUF_SIZE - 1;  // initially set to the last index of `pow_buf`
+
+        pow_t pow_it = pow;
+
+        if (pow_it < 0)
         {
-          mant_below = mant;
-        }
-        else
-        {
-          mant_below = mant % divisor;
+          stream << '-';
+
+          pow_it = -pow_it;
         }
 
-        /* do not print trailing zeros */
-        for (int i = 0; i < mant_digits_below; i++)
+        while (pow_it != 0)
         {
-          if (mant_below % BASE != 0)
-          {
-            break;
-          }
-          else
-          {
-            --mant_nz_digits_below;
-            mant_below /= BASE;
-          }
+          pow_t quo = pow_it / BASE;
+          pow_t rem = pow_it % BASE;
+
+          char digit = '0' + rem;
+
+          pow_buf[pow_idx--] = digit;
+
+          pow_it = quo;
         }
 
-        if (mant_nz_digits_below > 0)
+        for (pow_idx = 0; pow_idx < POW_BUF_SIZE; pow_idx++)
         {
-          stream << '.';
-          stream << std::setw(mant_nz_digits_below) << std::setfill('0') << std::right << mant_below;
+          if (pow_buf[pow_idx] != 0)
+          {
+            stream << pow_buf[pow_idx];
+          }
         }
       }
     }
+    /* Otherwise use decimal notation */
+    else
+    {
+      /* Print mantissa */
+      mant_t mant_it = mant;
+      pow_t pow_it = pow;
 
-    /* reset manipulators */
-    stream.flags(orig_stream_flags);
+      if (pow_it < 0)
+      {
+        stream << "0.";
+      }
+
+      while (pow_it < -1)
+      {
+        stream << '0';
+        ++pow_it;
+      }
+
+      while (mant_it != 0)
+      {
+        mant_t quo = mant_it / SCALE;
+        mant_t rem = mant_it % SCALE;
+
+        char digit = '0' + quo;
+
+        stream << digit;
+
+        if (pow_it == 0 and rem != 0)
+        {
+          stream << '.';
+        }
+
+        --pow_it;
+        mant_it = rem * BASE;
+      }
+
+      while (pow_it >= 0)
+      {
+        stream << '0';
+        --pow_it;
+      }
+    }
 
     return stream;
   }
@@ -1432,5 +1528,5 @@ dfloat_parse_done:
 inline
 std::ostream& operator<<(std::ostream& stream, const xu::dfloat& d)
 {
-  return d.print(stream);
+  return d.print_to(stream);
 }
