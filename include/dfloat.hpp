@@ -134,31 +134,39 @@ namespace xu
     pow = 0;
     while (value < 1)
     {
+      if (pow <= MIN_POW)
+      {
+        /* if underflow, make into denormal value or zero */
+        mant = (mant_t)(value * SCALE);
+        if (mant == 0)
+        {
+          sign = Sign::ZERO;
+          return;
+        }
+        else
+        {
+          return;
+        }
+      }
+
       value *= BASE;
       --pow;
     }
+
     while (value >= BASE)
     {
+      /* if overflow, make into nan */
+      if (pow >= MAX_POW)
+      {
+        sign = Sign::_NAN_;
+        return;
+      }
+
       value /= BASE;
       ++pow;
     }
 
     mant = (mant_t)(value * SCALE);
-
-    /*
-      I think there may be rounding errors when converting value to mant
-      Let's do a final check in case
-      */
-    while (mant < SCALE)
-    {
-      mant *= BASE;
-      --pow;
-    }
-    while (mant >= MANT_CAP)
-    {
-      mant /= BASE;
-      ++pow;
-    }
   }
 
   template <
@@ -423,17 +431,14 @@ namespace xu
       /* the difference may be small, i.e. below SCALE */
       while (res.mant < SCALE)
       {
-        res.mant *= BASE;
-        
-        /* overflow results in NaN */
-        // todo: allow denormal values (nonzero mant < SCALE)
+        /* underflow results in denormal value */
         if (res.pow <= MIN_POW)
         {
-          res.sign = Sign::_NAN_;
           break;
         }
         else
         {
+          res.mant *= BASE;
           --res.pow;
         }
       }
@@ -466,33 +471,46 @@ namespace xu
     dfloat res;
     res.sign = (sign == other.sign) ? Sign::POS : Sign::NEG;
     
-    int16_t new_pow = (int16_t)pow + (int16_t)other.pow;  // wider type in order to bounds check after final touches
+    pow2_t new_pow = (pow2_t)pow + (pow2_t)other.pow;  // wider type in order to bounds check after final touches
 
-    __uint128_t a = mant;
-    __uint128_t b = other.mant;
+    mant2_t a = mant;
+    mant2_t b = other.mant;
+    mant2_t new_mant = a * b / SCALE;
 
-    /*
-      We can demote from __uint128_t to uint64_t because 
-        99 million billion * 99 million billion / 100 million billion
-        is less than 2^64 - 1
-    */
-    res.mant = (mant_t)(a * b / SCALE);
-
-    if (res.mant >= MANT_CAP)
+    if (new_mant >= MANT_CAP)
     {
-      res.mant /= BASE;
+      new_mant /= BASE;
       ++new_pow;
     }
+
+    while (new_mant < SCALE)
+    {
+      new_mant *= BASE;
+      --new_pow;
+    }
     
-    /* overflow results in NaN */
-    if (new_pow > MAX_POW or new_pow < MIN_POW)
+    /* overflow results in nan */
+    if (new_pow > MAX_POW)
     {
       res.sign = Sign::_NAN_;
+      return res;
     }
-    else
+
+    /* underflow results in denormal or zero */
+    while (new_pow < MIN_POW)
     {
-      res.pow = new_pow;
+      new_mant /= 10;
+      ++new_pow;
+
+      if (new_mant == 0)
+      {
+        res.sign = Sign::ZERO;
+        return res;
+      }
     }
+
+    res.pow = new_pow;
+    res.mant = (mant_t)new_mant;
 
     return res;
   }
@@ -521,30 +539,46 @@ namespace xu
     dfloat res;
     res.sign = (sign == other.sign) ? Sign::POS : Sign::NEG;
     
-    int16_t new_pow = (int16_t)pow - (int16_t)other.pow;
+    pow2_t new_pow = (pow2_t)pow - (pow2_t)other.pow;
 
-    __uint128_t a = mant;
-    __uint128_t b = other.mant;
+    mant2_t a = mant;
+    mant2_t b = other.mant;
+    mant2_t new_mant = a * SCALE / b;
 
-    /* make it so that numerator is >= denominator, that way quotient will be between 1 and 10 */
-    if (a < b)
+    while (new_mant >= MANT_CAP)
     {
-      a = a * BASE;
+      new_mant /= BASE;
+      ++new_pow;
+    }
+
+    if (new_mant < SCALE)
+    {
+      new_mant *= BASE;
       --new_pow;
     }
-    
-    /* overflow results in NaN */
-    if (new_pow > MAX_POW or new_pow < MIN_POW)
+
+    /* overflow results in nan */
+    if (new_pow > MAX_POW)
     {
       res.sign = Sign::_NAN_;
-    }
-    else
-    {
-      res.pow = new_pow;
+      return res;
     }
 
-    /* multiply the numerator by scale before dividing */
-    res.mant = (mant_t)(a * SCALE / b);
+    /* underflow results in denormal or zero */
+    while (new_pow < MIN_POW)
+    {
+      new_mant /= 10;
+      ++new_pow;
+
+      if (new_mant == 0)
+      {
+        res.sign = Sign::ZERO;
+        return res;
+      }
+    }
+
+    res.pow = new_pow;
+    res.mant = (mant_t)new_mant;
 
     return res;
   }
@@ -1271,7 +1305,7 @@ dfloat_parse_done:
   }
 
   inline
-  std::string dfloat::to_string(const dfloat& d, int16_t exp_thresh)
+  std::string dfloat::to_string(const dfloat& d, pow2_t exp_thresh)
   {
     std::stringstream ss;
 
@@ -1281,7 +1315,7 @@ dfloat_parse_done:
   }
 
   inline
-  std::ostream& dfloat::print_to(std::ostream& stream, int16_t exp_thresh) const
+  std::ostream& dfloat::print_to(std::ostream& stream, pow2_t exp_thresh) const
   {
     /* edge case - nan */
     if (sign == Sign::_NAN_)

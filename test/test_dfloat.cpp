@@ -842,6 +842,11 @@ void not_a_number()
 void near_limits()
 {
   {
+    dfloat f(1e101);
+    assert_false(dfloat::isfinite(f));
+  }
+
+  {
     dfloat f1 = dfloat::parse("9.99999999999999999e100");
     assert(dfloat::isfinite(f1));
   }
@@ -872,16 +877,6 @@ void near_limits()
   }
 
   {
-    dfloat f1 = dfloat::parse("0.1e-100");
-    assert_false(dfloat::isfinite(f1));
-  }
-
-  {
-    dfloat f1 = dfloat::parse("-0.1e-100");
-    assert_false(dfloat::isfinite(f1));
-  }
-
-  {
     dfloat f1 = dfloat::parse("9.99999999999999999e100");
     assert_false(dfloat::isfinite(f1 + dfloat::parse("1e83")));
   }
@@ -889,16 +884,6 @@ void near_limits()
   {
     dfloat f1 = dfloat::parse("-9.99999999999999999e100");
     assert_false(dfloat::isfinite(f1 - dfloat::parse("1e83")));
-  }
-
-  {
-    dfloat f1 = dfloat::parse("1.1e-100");
-    assert_false(dfloat::isfinite(f1 - dfloat::parse("1e-100")));
-  }
-
-  {
-    dfloat f1 = dfloat::parse("-1.1e-100");
-    assert_false(dfloat::isfinite(f1 + dfloat::parse("1e-100")));
   }
 
   {
@@ -966,6 +951,126 @@ void near_limits()
   }
 }
 
+void denormal()
+{
+  // arithmetic resulting in denormal value
+  {
+    dfloat f1 = dfloat::parse("1.1e-100");
+    dfloat f2 = dfloat::parse("1e-100");
+    assert(dfloat::to_string(f1 - f2) == "0.1e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("-1.1e-100");
+    dfloat f2 = dfloat::parse("1e-100");
+    assert(dfloat::to_string(f1 + f2) == "-0.1e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1.01e-100");
+    dfloat f2 = dfloat::parse("1e-100");
+    assert(dfloat::to_string(f1 - f2) == "0.01e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100");
+    dfloat f2 = dfloat::parse("0.1");
+    assert(dfloat::to_string(f1 * f2) == "0.1e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100");
+    dfloat f2 = dfloat::parse("10");
+    assert(dfloat::to_string(f1 / f2) == "0.1e-100");
+  }
+
+  // arithmetic resulting in zero denormal
+  {
+    dfloat f1 = dfloat::parse("1e-100");
+    dfloat f2 = dfloat::parse("1e-18");
+    assert(dfloat::to_string(f1 * f2) == "0");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100");
+    dfloat f2 = dfloat::parse("1e18");
+    assert(dfloat::to_string(f1 / f2) == "0");
+  }
+
+  // arithmetic with denormal value as an operand
+  {
+    dfloat f1 = dfloat(1);
+    dfloat f2 = dfloat::parse("1e-100") / dfloat(10);
+    assert(f1 - f2 == f1);
+  }
+
+  {
+    dfloat f1 = dfloat(1);
+    dfloat f2 = dfloat::parse("1e-100") / dfloat(10);
+    assert(f1 + f2 == f1);
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1.2e-100");
+    dfloat f2 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    assert(dfloat::to_string(f1 - f2) == "1.1e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1.2e-100");
+    dfloat f2 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    assert(dfloat::to_string(f1 + f2) == "1.3e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("5e100");
+    dfloat f2 = dfloat::parse("2e-100") / dfloat(10);  // 0.2e-100
+    assert(f1 * f2 == 1);
+  }
+
+  {
+    dfloat f1 = dfloat::parse("5e100");
+    dfloat f2 = dfloat::parse("2e-100") / dfloat(100);  // 0.02e-100
+    assert(f1 * f2 == dfloat::parse("0.1"));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100");
+    dfloat f2 = dfloat::parse("2e-100") / dfloat(10);  // 0.2e-100
+    assert(f1 / f2 == dfloat::parse("5"));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("2e-100");
+    dfloat f2 = dfloat::parse("2e-100") / dfloat(100);  // 0.02e-100
+    assert(f1 / f2 == dfloat::parse("100"));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100");
+    dfloat f2 = dfloat::parse("2e-100") / dfloat(100);  // 0.02e-100
+    assert(f1 / f2 == dfloat::parse("50"));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    dfloat f2 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    assert(f1 / f2 == 1);
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    dfloat f2 = dfloat(10);
+    assert(dfloat::to_string(f1 / f2) == "0.01e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    dfloat f2 = dfloat::parse("0.1");
+    assert(dfloat::to_string(f1 * f2) == "0.01e-100");
+  }
+}
+
 int main()
 {
   constructors();
@@ -979,4 +1084,6 @@ int main()
   not_a_number();
 
   near_limits();
+
+  denormal();
 }

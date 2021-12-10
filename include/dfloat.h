@@ -45,6 +45,8 @@ namespace xu
     using sign_t = int8_t;
     using mant_t = uint64_t;
     using pow_t = int8_t;
+    using mant2_t = __uint128_t;  // type that can fit a product of `mant_t`
+    using pow2_t = int16_t;  // type that can fit a product of `pow_t`
 
     /**
       @brief  The scale of member variable `mant`
@@ -295,7 +297,7 @@ namespace xu
     /**
       @brief  Convert to string
       */
-    static std::string to_string(const dfloat& d, int16_t exp_thresh = 10);
+    static std::string to_string(const dfloat& d, pow2_t exp_thresh = 10);
 
     /**
       @brief  Converts dfloat to string on stream
@@ -304,10 +306,8 @@ namespace xu
                             if zero or below: always use scientific
                             if between 1 and MAX_POW: sometimes use scientific
                             if above MAX_POW: never use scientific
-      @note   Implementation note: we use int16_t because it is wider than
-              pow_t, which is necessarily required
       */
-    std::ostream& print_to(std::ostream& stream, int16_t exp_thresh = 10) const;
+    std::ostream& print_to(std::ostream& stream, pow2_t exp_thresh = 10) const;
     
     //  ==============
     //  Static Methods
