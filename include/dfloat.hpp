@@ -159,7 +159,7 @@ namespace xu
   // inline
   // dfloat::operator T() const
   // {
-    
+  //   const T_max = std::numeric_limits<T>::max();
   // }
 
   template <
@@ -574,6 +574,98 @@ namespace xu
     res.mant = (mant_t)new_mant;
 
     return res;
+  }
+
+  inline
+  dfloat dfloat::operator%(const dfloat& other) const
+  {
+    /* edge case: either is NaN */
+    if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
+    {
+      return dfloat(Sign::_NAN_, 0, 0);
+    }
+    
+    /* edge case: denominator zero */
+    if (other.sign == Sign::ZERO)
+    {
+      return dfloat(Sign::_NAN_, 0, 0);
+    }
+    
+    /* edge case: numerator is zero */
+    if (sign == Sign::ZERO)
+    {
+      return dfloat(Sign::ZERO, 0, 0);
+    }
+
+    /*
+      the way we defined the modulo operator, we can ignore the sign of the
+      second operand (op2)
+
+      also, we begin by ignoring the sign the first operand (op1), and then
+      flipping and adding the divisor later if negative
+    */
+
+    mant2_t new_mant = mant;  // needs to fit 10 * MANT_CAP
+    pow_t new_pow = pow;
+
+    /*
+      if op1 power is larger than op2 power by `n`, then let's first perform
+        op1 % (op2 * 10^n)
+    */
+    while (new_pow > other.pow)
+    {
+      new_mant = new_mant % other.mant;
+
+      if (new_mant == 0)
+      {
+        return dfloat(Sign::ZERO, 0, 0);
+      }
+
+      new_mant *= BASE;
+      --new_pow;
+    }
+
+    /*
+      if first operand is smaller than or same magnitude as second operand, we
+      can simply use the integer modulo and return
+    */
+    new_mant = new_mant % other.mant;
+    while (new_mant < SCALE)
+    {
+      /* underflow results in denormal value */
+      if (new_pow <= MIN_POW)
+      {
+        break;
+      }
+
+      new_mant *= BASE;
+      --new_pow;
+    }
+    
+    /*
+      if op1 sign is negative, just flip the sign and add the absolute 
+      value of the divisor
+        a % b =
+          b - ((-a) % b)        if ((-a) % b) is nonzero
+            - ((-a) % b)        if ((-a) % b) is zero
+    */
+    if (new_mant == 0)
+    {
+      return dfloat(Sign::ZERO, 0, 0);
+    }
+    else
+    {
+      if (sign == Sign::NEG)
+      {
+        dfloat res(Sign::POS, new_mant, new_pow);
+        return (other.sign == Sign::POS ? other : -other) - res;
+      }
+      else
+      {
+        dfloat res(Sign::POS, new_mant, new_pow);
+        return res;
+      }
+    }
   }
 
   inline

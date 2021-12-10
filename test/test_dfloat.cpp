@@ -838,6 +838,80 @@ void arithmetic()
     f /= dfloat(0.1);
     assert(f == dfloat(100));
   }
+
+  // modulo
+  assert(dfloat(0) % dfloat(3) == dfloat(0));
+  assert(dfloat(1) % dfloat(3) == dfloat(1));
+  assert(dfloat(2) % dfloat(3) == dfloat(2));
+  assert(dfloat(3) % dfloat(3) == dfloat(0));
+  assert(dfloat(4) % dfloat(3) == dfloat(1));
+  assert(dfloat(5) % dfloat(3) == dfloat(2));
+  assert(dfloat(6) % dfloat(3) == dfloat(0));
+
+  assert(dfloat(0) % dfloat(-3) == dfloat(0));
+  assert(dfloat(1) % dfloat(-3) == dfloat(1));
+  assert(dfloat(2) % dfloat(-3) == dfloat(2));
+  assert(dfloat(3) % dfloat(-3) == dfloat(0));
+  assert(dfloat(4) % dfloat(-3) == dfloat(1));
+  assert(dfloat(5) % dfloat(-3) == dfloat(2));
+  assert(dfloat(6) % dfloat(-3) == dfloat(0));
+
+  assert(dfloat(0) % dfloat(1) == dfloat(0));
+  assert(dfloat(1) % dfloat(1) == dfloat(0));
+  assert(dfloat(2) % dfloat(1) == dfloat(0));
+  assert(dfloat(3) % dfloat(1) == dfloat(0));
+
+  assert(dfloat(-1) % dfloat(1) == dfloat(0));
+  assert(dfloat(-2) % dfloat(1) == dfloat(0));
+  assert(dfloat(-3) % dfloat(1) == dfloat(0));
+  assert(dfloat(-4) % dfloat(1) == dfloat(0));
+
+  assert(dfloat(-1) % dfloat(3) == dfloat(2));
+  assert(dfloat(-2) % dfloat(3) == dfloat(1));
+  assert(dfloat(-3) % dfloat(3) == dfloat(0));
+  assert(dfloat(-4) % dfloat(3) == dfloat(2));
+  assert(dfloat(-5) % dfloat(3) == dfloat(1));
+  assert(dfloat(-6) % dfloat(3) == dfloat(0));
+  assert(dfloat(-7) % dfloat(3) == dfloat(2));
+  assert(dfloat(-8) % dfloat(3) == dfloat(1));
+  assert(dfloat(-9) % dfloat(3) == dfloat(0));
+
+  assert(dfloat(-1) % dfloat(-3) == dfloat(2));
+  assert(dfloat(-2) % dfloat(-3) == dfloat(1));
+  assert(dfloat(-3) % dfloat(-3) == dfloat(0));
+  assert(dfloat(-4) % dfloat(-3) == dfloat(2));
+  assert(dfloat(-5) % dfloat(-3) == dfloat(1));
+  assert(dfloat(-6) % dfloat(-3) == dfloat(0));
+  assert(dfloat(-7) % dfloat(-3) == dfloat(2));
+  assert(dfloat(-8) % dfloat(-3) == dfloat(1));
+  assert(dfloat(-9) % dfloat(-3) == dfloat(0));
+
+  assert(dfloat::parse("0") % dfloat::parse("0.1") == dfloat::parse("0"));
+  assert(dfloat::parse("0.1") % dfloat::parse("0.1") == dfloat::parse("0"));
+  assert(dfloat::parse("0.2") % dfloat::parse("0.1") == dfloat::parse("0"));
+  assert(dfloat::parse("-0.1") % dfloat::parse("0.1") == dfloat::parse("0"));
+  assert(dfloat::parse("-0.2") % dfloat::parse("0.1") == dfloat::parse("0"));
+
+  assert(dfloat::parse("0.11") % dfloat::parse("0.1") == dfloat::parse("0.01"));
+  assert(dfloat::parse("0.21") % dfloat::parse("0.1") == dfloat::parse("0.01"));
+  assert(dfloat::parse("-0.11") % dfloat::parse("0.1") == dfloat::parse("0.09"));
+  assert(dfloat::parse("-0.21") % dfloat::parse("0.1") == dfloat::parse("0.09"));
+
+  assert(dfloat::parse("0.11") % dfloat::parse("-0.1") == dfloat::parse("0.01"));
+  assert(dfloat::parse("0.21") % dfloat::parse("-0.1") == dfloat::parse("0.01"));
+  assert(dfloat::parse("-0.11") % dfloat::parse("-0.1") == dfloat::parse("0.09"));
+  assert(dfloat::parse("-0.21") % dfloat::parse("-0.1") == dfloat::parse("0.09"));
+
+  assert(dfloat::parse("1e10") % dfloat::parse("1e10") == dfloat::parse("0"));
+  assert(dfloat::parse("1e100") % dfloat::parse("1e10") == dfloat::parse("0"));
+  assert(dfloat::parse("1e10") % dfloat::parse("1e-10") == dfloat::parse("0"));
+  assert(dfloat::parse("1e100") % dfloat::parse("1e-10") == dfloat::parse("0"));
+
+  assert(dfloat::parse("1.1e10") % dfloat::parse("1e10") == dfloat::parse("1e9"));
+  assert(dfloat::parse("1.1e99") % dfloat::parse("1e10") == dfloat::parse("0"));
+  assert(dfloat::parse("1.1e10") % dfloat::parse("1e-10") == dfloat::parse("0"));
+  assert(dfloat::parse("1.1e-10") % dfloat::parse("1e-10") == dfloat::parse("1e-11"));
+
 }
 
 void not_a_number()
@@ -1135,6 +1209,36 @@ void denormal()
     dfloat f1 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
     dfloat f2 = dfloat::parse("0.1");
     assert(dfloat::to_string(f1 * f2) == "0.01e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("5e-100") / dfloat(10);  // 0.5e-100
+    dfloat f2 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    assert(dfloat::to_string(f1 % f2) == "0");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("5e-100") / dfloat(10);  // 0.5e-100
+    dfloat f2 = dfloat::parse("2e-100") / dfloat(10);  // 0.2e-100
+    assert(dfloat::to_string(f1 % f2) == "0.1e-100");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("2e-100") / dfloat(10);  // 0.2e-100
+    dfloat f2 = dfloat::parse("5e-100") / dfloat(10);  // 0.5e-100
+    assert(dfloat::to_string(f1 % f2) == "0.2e-100");
+  }
+
+  {
+    dfloat f1 = dfloat(1);
+    dfloat f2 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    assert(dfloat::to_string(f1 % f2) == "0");
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100") / dfloat(10);  // 0.1e-100
+    dfloat f2 = dfloat(1);
+    assert(dfloat::to_string(f1 % f2) == "0.1e-100");
   }
 }
 

@@ -157,7 +157,7 @@ namespace xu
       typename T,
       typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
     dfloat(T value);
-    
+
     // template <
     //   typename T,
     //   typename std::enable_if_t<
@@ -235,6 +235,19 @@ namespace xu
               If divisor is zero
       */
     dfloat operator/(const dfloat& other) const;
+
+    /**
+      @brief  Modulo another float
+              Returns R = F + N * D, where
+                R is the result as dfloat
+                F is the number represented by the dfloat
+                D is the divisor (second operand)
+                N is the integer that satisfies
+                  0 <= R < D
+      @note   It is implemented by repeated subtraction (with help of integer
+              modulo operator), so it is slow.
+      */
+    dfloat operator%(const dfloat& other) const;
 
   protected:
     /**
