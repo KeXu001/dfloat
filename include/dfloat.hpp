@@ -388,7 +388,7 @@ namespace xu
       pow_t a_pow, b_pow;
 
       /* this is larger magnitude than other */
-      if (compare > ComparisonResult::MORE)
+      if (compare == ComparisonResult::MORE)
       {
         a_mant = mant;
         a_pow = pow;
@@ -426,6 +426,7 @@ namespace xu
         res.mant *= BASE;
         
         /* overflow results in NaN */
+        // todo: allow denormal values (nonzero mant < SCALE)
         if (res.pow <= MIN_POW)
         {
           res.sign = Sign::_NAN_;

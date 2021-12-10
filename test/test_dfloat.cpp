@@ -51,6 +51,7 @@ void constructors()
 
   {
     dfloat f1(0);
+    __attribute__((__unused__))
     dfloat f2 = f1;
   }
 
@@ -61,6 +62,7 @@ void constructors()
 
   {
     dfloat f1(0);
+    __attribute__((__unused__))
     dfloat f2 = std::move(f1);
   }
 
@@ -492,6 +494,47 @@ void to_from_strings()
     assert_false(dfloat::isfinite(f));
   }
 
+  // truncation
+  {
+    dfloat f = dfloat::parse("1000000000000000009");
+    assert(dfloat::to_string(f) == "1.0e18");
+  }
+
+  {
+    dfloat f = dfloat::parse("-1000000000000000009");
+    assert(dfloat::to_string(f) == "-1.0e18");
+  }
+
+  {
+    dfloat f = dfloat::parse("0.1000000000000000009");
+    assert(dfloat::to_string(f) == "0.1");
+  }
+
+  {
+    dfloat f = dfloat::parse("-0.1000000000000000009");
+    assert(dfloat::to_string(f) == "-0.1");
+  }
+
+  {
+    dfloat f = dfloat::parse("1000000000000000789");
+    assert(dfloat::to_string(f) == "1.00000000000000078e18");
+  }
+
+  {
+    dfloat f = dfloat::parse("-1000000000000000789");
+    assert(dfloat::to_string(f) == "-1.00000000000000078e18");
+  }
+
+  {
+    dfloat f = dfloat::parse("0.1000000000000000789");
+    assert(dfloat::to_string(f) == "0.100000000000000078");
+  }
+
+  {
+    dfloat f = dfloat::parse("-0.1000000000000000789");
+    assert(dfloat::to_string(f) == "-0.100000000000000078");
+  }
+
   // nan
   {
     assert(dfloat::to_string(dfloat(NAN)) == "nan");
@@ -798,7 +841,129 @@ void not_a_number()
 
 void near_limits()
 {
-  
+  {
+    dfloat f1 = dfloat::parse("9.99999999999999999e100");
+    assert(dfloat::isfinite(f1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("-9.99999999999999999e100");
+    assert(dfloat::isfinite(f1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100");
+    assert(dfloat::isfinite(f1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("-1e-100");
+    assert(dfloat::isfinite(f1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("10e100");
+    assert_false(dfloat::isfinite(f1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("-10e100");
+    assert_false(dfloat::isfinite(f1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("0.1e-100");
+    assert_false(dfloat::isfinite(f1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("-0.1e-100");
+    assert_false(dfloat::isfinite(f1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("9.99999999999999999e100");
+    assert_false(dfloat::isfinite(f1 + dfloat::parse("1e83")));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("-9.99999999999999999e100");
+    assert_false(dfloat::isfinite(f1 - dfloat::parse("1e83")));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1.1e-100");
+    assert_false(dfloat::isfinite(f1 - dfloat::parse("1e-100")));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("-1.1e-100");
+    assert_false(dfloat::isfinite(f1 + dfloat::parse("1e-100")));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1.1e-100");
+    assert(dfloat::isfinite(f1 - dfloat::parse("1.1e-100")));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("-1.1e-100");
+    assert(dfloat::isfinite(f1 + dfloat::parse("1.1e-100")));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("9.99999999999999999e99");
+    dfloat f2 = dfloat::parse("2");
+    assert(dfloat::isfinite(f1 * f2));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("2e-100");
+    dfloat f2 = dfloat::parse("2");
+    assert(dfloat::isfinite(f1 / f2));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e100");
+    dfloat f2 = dfloat::parse("1e-100");
+    assert(f1 * f2 == dfloat(1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("9e100");
+    dfloat f2 = dfloat::parse("9e100");
+    assert(f1 / f2 == dfloat(1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-100");
+    dfloat f2 = dfloat::parse("1e-100");
+    assert(f1 / f2 == dfloat(1));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("2e50");
+    dfloat f2 = dfloat::parse("4.4999e50");
+    assert(dfloat::isfinite(f1 * f2));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("2e50");
+    dfloat f2 = dfloat::parse("5e50");
+    assert_false(dfloat::isfinite(f1 * f2));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e50");
+    dfloat f2 = dfloat::parse("1e-50");
+    assert(dfloat::isfinite(f1 / f2));
+  }
+
+  {
+    dfloat f1 = dfloat::parse("1e-50");
+    dfloat f2 = dfloat::parse("1e50");
+    assert(dfloat::isfinite(f1 / f2));
+  }
 }
 
 int main()
