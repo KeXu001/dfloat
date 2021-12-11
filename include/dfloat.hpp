@@ -159,22 +159,96 @@ namespace xu
   inline
   dfloat::operator T() const
   {
-    constexpr T T_max = std::numeric_limits<T>::max();
-
-    /* perform modulo in dfloat-land */
-    dfloat rem(operator%(dfloat(T_max) + 1));
-
-    /*
-      scale until `pow` equals -SCALE_POW, so that `mant` is equal to the
-      integer value represented
-    */
-    while (rem.pow < SCALE_POW)
+    /* edge case: is nan */
+    if (sign == Sign::_NAN_)
     {
-      rem.mant /= BASE;
-      ++rem.pow;
+      return 0;
     }
 
-    return (T)(rem.mant);
+    /*
+      We convert by doing repeated subtraction of multiples of the divisor,
+      where the divisor is `2^(size of typename T in bits)`.
+
+      Multiples take the form of `divisor * 10^n`, where n is zero or positive
+
+      Subtraction of these multiple of the divisor is implemented with the
+      integer modulo operator.
+    */
+
+    constexpr T T_max = std::numeric_limits<T>::max();
+
+    mant2_t divisor = T_max;
+    ++divisor;
+
+    /*
+      we begin by ignoring the sign
+      if negative, we will flip and add the divisor as necessary at the end
+    */
+
+    mant2_t new_mant = mant;
+    pow_t new_pow = pow;
+
+    /*
+      if the power is below SCALE_POW, we will not subtract because
+      `divisor * 10^n` is only valid for nonnegative `n`
+    */
+    while (new_pow < SCALE_POW)
+    {
+      new_mant /= BASE;
+      ++new_pow;
+
+      /* if underflow, this was a decimal less than 1 */
+      if (new_mant == 0)
+      {
+        return 0;
+      }
+    }
+
+    /*
+      if the power is at or above SCALE_POW, then we can subtract
+      `divisor * 10^n`
+    */
+    while (new_pow > SCALE_POW)
+    {
+      new_mant = new_mant % divisor;
+
+      if (new_mant == 0)
+      {
+        return 0;
+      }
+
+      new_mant *= BASE;
+      --new_pow;
+    }
+
+    /*
+      for this last iteration, we are subtracting the divisor itself, not a
+      multiple
+    */
+    new_mant = new_mant % divisor;
+    
+    /*
+      if our sign was negative, just flip the sign and conditionally add the
+      absolute value of the divisor (in this case it's always positive)
+        a % b =
+          b - ((-a) % b)        if ((-a) % b) is nonzero
+            - ((-a) % b)        if ((-a) % b) is zero
+    */
+    if (new_mant == 0)
+    {
+      return 0;
+    }
+    else
+    {
+      if (sign == Sign::NEG)
+      {
+        return (T)(divisor - new_mant);
+      }
+      else
+      {
+        return (T)(new_mant);
+      }
+    }
   }
 
   /* assume that cast from unsigned to signed is correct mapping */
@@ -605,98 +679,6 @@ namespace xu
     res.mant = (mant_t)new_mant;
 
     return res;
-  }
-
-  inline
-  dfloat dfloat::operator%(const dfloat& other) const
-  {
-    /* edge case: either is NaN */
-    if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
-    {
-      return dfloat(Sign::_NAN_, 0, 0);
-    }
-    
-    /* edge case: denominator zero */
-    if (other.sign == Sign::ZERO)
-    {
-      return dfloat(Sign::_NAN_, 0, 0);
-    }
-    
-    /* edge case: numerator is zero */
-    if (sign == Sign::ZERO)
-    {
-      return dfloat(Sign::ZERO, 0, 0);
-    }
-
-    /*
-      the way we defined the modulo operator, we can ignore the sign of the
-      second operand (op2)
-
-      also, we begin by ignoring the sign the first operand (op1), and then
-      flipping and adding the divisor later if negative
-    */
-
-    mant2_t new_mant = mant;  // needs to fit 10 * MANT_CAP
-    pow_t new_pow = pow;
-
-    /*
-      if op1 power is larger than op2 power by `n`, then let's first perform
-        op1 % (op2 * 10^n)
-    */
-    while (new_pow > other.pow)
-    {
-      new_mant = new_mant % other.mant;
-
-      if (new_mant == 0)
-      {
-        return dfloat(Sign::ZERO, 0, 0);
-      }
-
-      new_mant *= BASE;
-      --new_pow;
-    }
-
-    /*
-      if first operand is smaller than or same magnitude as second operand, we
-      can simply use the integer modulo and return
-    */
-    new_mant = new_mant % other.mant;
-    while (new_mant < SCALE)
-    {
-      /* underflow results in denormal value */
-      if (new_pow <= MIN_POW)
-      {
-        break;
-      }
-
-      new_mant *= BASE;
-      --new_pow;
-    }
-    
-    /*
-      if op1 sign is negative, just flip the sign and add the absolute 
-      value of the divisor
-        a % b =
-          b - ((-a) % b)        if ((-a) % b) is nonzero
-            - ((-a) % b)        if ((-a) % b) is zero
-    */
-    if (new_mant == 0)
-    {
-      return dfloat(Sign::ZERO, 0, 0);
-    }
-    else
-    {
-      if (sign == Sign::NEG)
-      {
-        dfloat res(Sign::POS, new_mant, new_pow);
-        return (other.sign == Sign::POS ? other : -other) - res;
-      }
-      else
-      {
-        dfloat res(Sign::POS, new_mant, new_pow);
-        return res;
-      }
-    }
   }
 
   inline

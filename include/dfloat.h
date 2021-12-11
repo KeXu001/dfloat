@@ -158,6 +158,14 @@ namespace xu
       typename std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
     dfloat(T value);
 
+    /*
+      @brief  Convert to unsigned integer
+              Returns the remainder R of the division F / D, where D is the
+              divisor i.e. the number of integers representable by typename T,
+              minus any fractional part, such that 0 <= R < D
+      @note   nan will be converted to 0
+      @note   this will not work for types larger than `mant_t`
+    */
     template <
       typename T,
       typename std::enable_if_t<
@@ -165,6 +173,12 @@ namespace xu
         bool> = true>
     explicit operator T() const;
 
+    /*
+      @brief  Convert to unsigned integer
+              Similiar to the version for unsigned types, except that R is
+              within the valid range for signed typename T
+      @note   nan will be converted to 0
+    */
     template <
       typename T,
       typename std::enable_if_t<
@@ -242,19 +256,6 @@ namespace xu
               If divisor is zero
       */
     dfloat operator/(const dfloat& other) const;
-
-    /**
-      @brief  Modulo another float
-              Returns R = F + N * D, where
-                R is the result as dfloat
-                F is the number represented by the dfloat
-                D is the divisor (second operand)
-                N is the integer that satisfies
-                  0 <= R < D
-      @note   It is implemented by repeated subtraction (with help of integer
-              modulo operator), so it is slow.
-      */
-    dfloat operator%(const dfloat& other) const;
 
   protected:
     /**
