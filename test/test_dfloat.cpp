@@ -96,14 +96,18 @@ void constructors()
 
   {
     int64_t x = -1-9223372036854775807ll;  // stackoverflow 57105469
+    int64_t x2 = -9223372036854775800ll;  // truncated to 18 sig figs
     dfloat f(x);
-    assert(f - 1 == dfloat::parse("-9223372036854775809"));
+    dfloat f2(x2);
+    assert(f == f2);
   }
 
   {
     uint64_t x = 18446744073709551615ull;
+    uint64_t x2 = 18446744073709551600ull;  // truncated to 18 sig figs
     dfloat f(x);
-    assert(f + 1 == dfloat::parse("18446744073709551616"));
+    dfloat f2(x2);
+    assert(f == f2);
   }
 
   {

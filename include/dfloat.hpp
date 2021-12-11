@@ -52,7 +52,7 @@ namespace xu
     }
 
     sign = Sign::POS;
-    mant = value;    
+    mant = value;
 
     pow = SCALE_POW;
     while (mant < SCALE)
@@ -78,7 +78,7 @@ namespace xu
       bool> = true>
   inline
   dfloat::dfloat(T value)
-    : dfloat(typename std::make_unsigned<T>::type(value > 0 ? value : -value))
+    : dfloat(typename std::make_unsigned<T>::type(value >= 0 ? value : -value))
   {
     if (value < 0)
     {
