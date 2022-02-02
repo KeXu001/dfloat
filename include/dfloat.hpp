@@ -681,6 +681,95 @@ namespace xu
     return res;
   }
 
+  inline dfloat dfloat::operator%(const dfloat& other) const
+  {
+    /* edge case: either is NaN */
+    if (sign == Sign::_NAN_ or other.sign == Sign::_NAN_)
+    {
+      return dfloat(Sign::_NAN_, 0, 0);
+    }
+    
+    /* edge case: denominator zero */
+    if (other.sign == Sign::ZERO)
+    {
+      return dfloat(Sign::_NAN_, 0, 0);
+    }
+    
+    /* edge case: numerator is zero */
+    if (sign == Sign::ZERO)
+    {
+      return dfloat(Sign::ZERO, 0, 0);
+    }
+
+    /*
+      The way we defined the modulo operator, we can ignore the sign of the
+      second operand
+
+      We begin by ignoring the sign of the first operand, and then flipping and 
+      adding the divisor later if negative
+
+      We will perform the modulo by doing repeated subtraction of
+      power-of-ten-multiples of the divisor (divisor * 10^n), using the integer
+      modulo operator, until the remainder is 
+    */
+
+    mant2_t new_mant = mant;
+    pow_t new_pow = pow;
+
+    while (new_pow > other.pow)
+    {
+      new_mant = new_mant % other.mant;
+
+      if (new_mant == 0)
+      {
+        return dfloat(Sign::ZERO, 0, 0);
+      }
+
+      new_mant *= BASE;
+      --new_pow;
+    }
+
+    /*
+      if first operand is smaller than or same magnitude as second operand, we
+      can simply use the integer modulo and return
+    */
+    new_mant = new_mant % other.mant;
+    while (new_mant < SCALE)
+    {
+      /* underflow results in denormal value */
+      if (new_pow <= MIN_POW)
+      {
+        break;
+      }
+
+      new_mant *= BASE;
+      --new_pow;
+    }
+
+    if (new_mant == 0)
+    {
+      return dfloat(Sign::ZERO, 0, 0);
+    }
+
+    /*
+      if the first operand is negative, just flip the sign and add the absolute
+      value of the divisor
+        A % B =
+          B - ((-A) % B)        if ((-A) % B) is nonzero
+            - ((-A) % B)        if ((-A) % B) is zero
+    */
+    if (sign == Sign::NEG)
+    {
+      dfloat res(Sign::POS, new_mant, new_pow);
+      return (other.sign == Sign::POS ? other : -other) - res;
+    }
+    else
+    {
+      dfloat res(Sign::POS, new_mant, new_pow);
+      return res;
+    }
+  }
+
   inline
   dfloat::ComparisonResult dfloat::_comparedTo(const dfloat& other) const
   {

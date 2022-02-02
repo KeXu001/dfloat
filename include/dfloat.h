@@ -252,10 +252,16 @@ namespace xu
     /**
       @brief  Divide by a dfloat
       @note   Uses __uint128_t to perform 128-bit division
-      @throw  std::runtime_error
-              If divisor is zero
       */
     dfloat operator/(const dfloat& other) const;
+
+    /**
+      @brief  Modulo another dfloat
+      @note   Given two dfloats A and B, this method returns R such that:
+                R = A - N * B
+                N is an integer
+      */
+    dfloat operator%(const dfloat& other) const;
 
   protected:
     /**
