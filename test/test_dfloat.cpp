@@ -892,6 +892,22 @@ void arithmetic()
   assert(dfloat(10) / dfloat(0.1) == dfloat(100));
   assert(dfloat(0.1) / dfloat(0.1) == dfloat(1));
 
+  assert(dfloat(1) % dfloat(1) == dfloat(0));
+  assert(dfloat(5) % dfloat(2) == dfloat(1));
+  assert(dfloat(5) % dfloat(3) == dfloat(2));
+  assert(dfloat(5) % dfloat(5) == dfloat(0));
+  assert(dfloat(-5) % dfloat(2) == dfloat(1));
+  assert(dfloat(-5) % dfloat(3) == dfloat(1));
+  assert(dfloat(-5) % dfloat(5) == dfloat(0));
+
+  assert(dfloat::parse("5.4") % dfloat::parse("1.1") == dfloat(1));
+  assert(dfloat::parse("-5.4") % dfloat::parse("1.1") == dfloat::parse("0.1"));
+
+
+  assert(dfloat::parse("1000.35") % dfloat::parse("0.01") == dfloat::parse("0"));
+  assert(dfloat::parse("1000.356") % dfloat::parse("0.01") == dfloat::parse("0.006"));
+  assert(dfloat::parse("-1000.356") % dfloat::parse("0.01") == dfloat::parse("0.004"));
+
   {
     dfloat f(0);
     f += dfloat(1);
@@ -1256,4 +1272,6 @@ int main()
   near_limits();
 
   denormal();
+
+  std::cout << "Completed without errors" << std::endl;
 }
